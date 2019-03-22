@@ -27,3 +27,7 @@ npm run build
 jupyter lab build
 ```
 
+To use extension:
+```bash
+run "Hello World sample" in command palette
+```
