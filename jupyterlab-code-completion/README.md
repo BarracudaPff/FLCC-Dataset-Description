@@ -25,6 +25,7 @@ Also for server extension (to be sure)
 ```
 cd jupyterlab-code-completion
 pip install .
+jupyter serverextension enable --py jupyterlab-code-completion --sys-prefix
 ```
 
 To use extension:
