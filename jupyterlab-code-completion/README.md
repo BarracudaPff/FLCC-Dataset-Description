@@ -7,11 +7,11 @@ A JupyterLab extension for code completion.
 * JupyterLab
 
 ## Installation
-
-
+```
+jupyter labextension install jupyterlab-code-completion
+```
 
 ## Development
-
 For a development install (requires npm version 4 or later), do the following in the repository directory:
 
 ```bash
@@ -20,14 +20,14 @@ npm run build
 jupyter labextension link .
 ```
 
-To rebuild the package and the JupyterLab app:
+Also for server extension (to be sure)
 
-```bash
-npm run build
-jupyter lab build
+```
+cd jupyterlab-code-completion
+pip install .
 ```
 
 To use extension:
-```bash
-run "Hello World sample" in command palette
+```
+run "Hello World" or "Get Code" in command palette
 ```
