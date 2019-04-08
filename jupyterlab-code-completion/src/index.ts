@@ -2,16 +2,24 @@ import {
     JupyterLab,
     JupyterLabPlugin
 } from '@jupyterlab/application';
+
 import {ICommandPalette} from "@jupyterlab/apputils";
+
 import {INotebookTracker} from "@jupyterlab/notebook";
+
 import {
     Completer,
     CompleterModel,
     CompletionHandler
 } from "@jupyterlab/completer";
+
 import {Widget} from '@phosphor/widgets';
+
 import {FullLineP3Connector} from "./connector";
 
+/**
+ * The command IDs and category used by the code completion plugin
+ */
 namespace CommandIDs {
     export const invoke = 'code-completion:invoke';
 
@@ -26,6 +34,9 @@ namespace CommandIDs {
     export const category = 'Code Completion';
 }
 
+/**
+ * A plugin providing full line code completion for notebooks.
+ */
 const extension: JupyterLabPlugin<void> = {
     id: 'jupyterlab-code-completion',
     autoStart: true,
@@ -35,8 +46,10 @@ const extension: JupyterLabPlugin<void> = {
                notebooks: INotebookTracker) => {
         console.log('JupyterLab extension jupyterlab-code-completion is activated!');
 
+        // Create a handler for each notebook that is created.
         const handlers: { [id: string]: CompletionHandler } = {};
 
+        //Invoke completions
         app.commands.addCommand(CommandIDs.invoke, {
             execute: args => {
                 let id = args && (args['id'] as string);
@@ -51,6 +64,7 @@ const extension: JupyterLabPlugin<void> = {
             }
         });
 
+        //Select completion
         app.commands.addCommand(CommandIDs.select, {
             execute: args => {
                 let id = args && (args['id'] as string);
@@ -65,6 +79,7 @@ const extension: JupyterLabPlugin<void> = {
             }
         });
 
+        //Invoke completion in Notebook
         app.commands.addCommand(CommandIDs.invokeNotebook, {
             label: 'Show completions',
             execute: () => {
@@ -75,6 +90,7 @@ const extension: JupyterLabPlugin<void> = {
             }
         });
 
+        //Select completion in Notebook
         app.commands.addCommand(CommandIDs.selectNotebook, {
             label: 'Select statement',
             execute: () => {
@@ -129,18 +145,21 @@ const extension: JupyterLabPlugin<void> = {
             });
         });
 
+        // Set ctrl space key command for notebook completion invoke command.
         app.commands.addKeyBinding({
             command: CommandIDs.invokeNotebook,
             keys: ['Ctrl Space'],
             selector: `.jp-Notebook.jp-mod-editMode`
         });
 
+        // Set enter key for notebook completion select command.
         app.commands.addKeyBinding({
             command: CommandIDs.selectNotebook,
             keys: ['Enter'],
             selector: `.jp-Notebook .jp-mod-completer-active`
         });
 
+        //add main commands to palette
         palette.addItem({command: CommandIDs.invokeNotebook, category: CommandIDs.category});
         palette.addItem({command: CommandIDs.selectNotebook, category: CommandIDs.category});
     }
