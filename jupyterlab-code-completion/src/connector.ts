@@ -40,7 +40,6 @@ export class FullLineP3Connector extends DataConnector<CompletionHandler.IReply,
             Private.fetchMy(code, json => {
                 const cursor = this._editor.getCursorPosition();
                 const token = this._editor.getTokenForPosition(cursor);
-                console.log(json.completions);
                 resolve({
                     start: token.offset,
                     end: token.offset + token.value.length,

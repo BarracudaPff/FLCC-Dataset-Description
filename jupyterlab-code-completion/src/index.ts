@@ -103,7 +103,6 @@ const extension: JupyterLabPlugin<void> = {
         });
 
         notebooks.widgetAdded.connect(() => {
-            console.log('notebooks.widgetAdded.connect');
             const cell = notebooks.currentWidget.content.activeCell;
             const editor = cell && cell.editor;
             //const session = panel.session;

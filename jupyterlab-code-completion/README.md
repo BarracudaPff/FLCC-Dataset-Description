@@ -4,7 +4,9 @@ A JupyterLab extension for code completion.
 
 ## Prerequisites
 
-* JupyterLab
+* JupyterLab 
+
+*(stable at 0.35.4)*
 
 ## Installation
 ```
@@ -20,7 +22,7 @@ npm run build
 jupyter labextension link .
 ```
 
-Also for server extension (to be sure)
+Also for server extension, do the following in the repository directory:
 
 ```
 cd jupyterlab-code-completion
@@ -30,5 +32,5 @@ jupyter serverextension enable --py jupyterlab-code-completion --sys-prefix
 
 To use extension:
 ```
-run "Hello World" or "Get Code" in command palette
+Select "Select statement" or "Show completions" in command palette, while editing notebook's cell
 ```
