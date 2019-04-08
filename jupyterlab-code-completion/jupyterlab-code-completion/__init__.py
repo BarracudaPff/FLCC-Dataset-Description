@@ -6,5 +6,9 @@ def _jupyter_server_extension_paths():
         "module": "jupyterlab-code-completion"
     }]
 
+
 def load_jupyter_server_extension(nb_app):
+    """
+    Load the Jupyter server extension.
+    """
     setup_handlers(nb_app.web_app)
