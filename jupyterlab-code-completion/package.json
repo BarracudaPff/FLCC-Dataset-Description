@@ -1,0 +1,47 @@
+{
+  "name": "jupyterlab-code-completion",
+  "version": "0.1.0",
+  "description": "A JupyterLab extension for full line code completion",
+  "keywords": [
+    "jupyter",
+    "jupyterlab",
+    "jupyterlab-extension"
+  ],
+  "homepage": "https://github.com/isaintnik/full-line-code-completion",
+  "bugs": {
+    "url": "https://github.com/isaintnik/full-line-code-completion/issues"
+  },
+  "license": "BSD-3-Clause",
+  "author": "*authors here*",
+  "files": [
+    "lib/**/*.{d.ts,eot,gif,html,jpg,js,js.map,json,png,svg,woff2,ttf}",
+    "style/**/*.{css,eot,gif,html,jpg,json,png,svg,woff2,ttf}"
+  ],
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/isaintnik/full-line-code-completion.git"
+  },
+  "scripts": {
+    "build": "tsc",
+    "build:labextension": "rimraf lab-dist && mkdirp lab-dist && cd lab-dist && npm pack ..",
+    "clean": "rimraf lib",
+    "prepare": "npm run clean && npm run build",
+    "watch": "tsc -w"
+  },
+  "dependencies": {
+    "@jupyterlab/application": "^0.19.1",
+    "@jupyterlab/completer": "^0.19.1",
+    "@jupyterlab/coreutils": "^2.2.1",
+    "@jupyterlab/fileeditor": "^0.19.1",
+    "@jupyterlab/notebook": "^0.19.2"
+  },
+  "devDependencies": {
+    "rimraf": "^2.6.1",
+    "typescript": "~3.1.1"
+  },
+  "jupyterlab": {
+    "extension": true
+  }
+}
