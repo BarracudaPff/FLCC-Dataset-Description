@@ -1,7 +1,9 @@
 import {
-    DataConnector,
-    PageConfig,
-    URLExt
+    ServerConnection
+} from '@jupyterlab/services'
+
+import {
+    DataConnector
 } from "@jupyterlab/coreutils";
 
 import {CompletionHandler} from "@jupyterlab/completer";
@@ -37,9 +39,10 @@ export class FullLineP3Connector extends DataConnector<CompletionHandler.IReply,
     ): Promise<CompletionHandler.IReply> {
         return new Promise<CompletionHandler.IReply>(resolve => {
             const code = this._editor.model.value.text;
-            Private.fetchMy(code, json => {
+            Private.getCompletions(code, json => {
                 const cursor = this._editor.getCursorPosition();
                 const token = this._editor.getTokenForPosition(cursor);
+
                 resolve({
                     start: token.offset,
                     end: token.offset + token.value.length,
@@ -64,6 +67,7 @@ export namespace FullLineP3Connector {
          */
         editor: CodeEditor.IEditor;
     }
+
 }
 
 /**
@@ -72,23 +76,30 @@ export namespace FullLineP3Connector {
 namespace Private {
 
     /**
+     * Response from server extension
+     */
+    export interface IResponse {
+        completions: string[]
+    }
+
+    /**
      * Get a list of completion hints from a server extension
      *
      * @param code - full code from editor
      * @param json - response from server extension
      */
-    export function fetchMy(code: string, json: (json: any) => void) {
-        const url = URLExt.join(PageConfig.getOption('baseUrl'), '/completion/python3');
-
-        fetch(url, {
+    export function getCompletions(code: string, json: (json: IResponse) => void) {
+        const settings = ServerConnection.makeSettings();
+        const url = new URL("completion/python3", settings.baseUrl);
+        let request: RequestInit = {
             method: 'POST',
             body: JSON.stringify({
                 code
             }),
-            headers: {
-                "Content-type": "application/json; charset=UTF-8"
-            }
-        }).then(response => response.json())
+        };
+        ServerConnection
+            .makeRequest(url.toString(), request, settings)
+            .then(response => response.json())
             .then(json);
     }
 }

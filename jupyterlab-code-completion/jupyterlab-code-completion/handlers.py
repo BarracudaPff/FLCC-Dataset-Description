@@ -29,7 +29,7 @@ def setup_handlers(web_app):
     Setups all of the completions command handlers.
     """
 
-    # posible expand here
+    # possible expand here
     completion_handlers = [
         ("/completion/python3", Python3Handler)
     ]
