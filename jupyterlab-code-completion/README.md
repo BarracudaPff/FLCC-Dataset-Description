@@ -6,14 +6,12 @@ A JupyterLab extension for code completion.
 
 * JupyterLab 
 
-*(stable at 0.35.4)*
+*(stable at 1.0.1)*
 
 ## Installation
-Perform step by step
+Perform script or step by step
 ```bash
-jupyter labextension install jupyterlab-code-completion
-pip install jupyterlab-code-completion
-jupyter serverextension enable --py jupyterlab-code-completion
+./scripts/install.sh
 ```
 
 ## Usage
@@ -23,21 +21,13 @@ Select `Select statement` or `Show completions` in command palette, while editin
 ## Development
 Requires npm version 4 or later
 
+Perform script or step by step
 ```bash
-cd jupyterlab-code-completion
-npm install
-npm run build
-jupyter labextension link .
-```
-Also for server extension
-```bash
-pip install .
-jupyter serverextension enable --py jupyterlab-code-completion
+./scripts/dev.sh
 ```
 
 To rebuild the package and the JupyterLab app:
 
 ```bash
-npm run build
-jupyter lab build
+./scripts/build.sh
 ```

@@ -3,7 +3,7 @@ from setuptools import find_packages
 
 setup(
     name                = 'jupyterlab-code-completion',
-    version             = '0.1.0',
+    version             = '0.2.0',
     description         = 'A Jupyter server extension for code completion',
     packages            = find_packages(),
     author              = '*author here*',
