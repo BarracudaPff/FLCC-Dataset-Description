@@ -1,21 +1,32 @@
 import {
-    JupyterLab,
-    JupyterLabPlugin
+    JupyterFrontEndPlugin,
+    JupyterFrontEnd
 } from '@jupyterlab/application';
 
-import {ICommandPalette} from "@jupyterlab/apputils";
+import {
+    ICommandPalette
+} from "@jupyterlab/apputils";
 
-import {INotebookTracker} from "@jupyterlab/notebook";
+import {
+    INotebookTracker
+} from "@jupyterlab/notebook";
 
 import {
     Completer,
-    CompleterModel,
+    CompleterModel, CompletionConnector,
     CompletionHandler
 } from "@jupyterlab/completer";
 
-import {Widget} from '@phosphor/widgets';
+import {
+    ServerConnection
+} from '@jupyterlab/services';
 
-import {FullLineP3Connector} from "./connector";
+import {
+    Widget
+} from '@phosphor/widgets';
+import {
+    FullLineP3Connector
+} from "./connector";
 
 /**
  * The command IDs and category used by the code completion plugin
@@ -34,17 +45,38 @@ namespace CommandIDs {
     export const category = 'Code Completion';
 }
 
+function checkCompletionServer(result: (isRunning: boolean) => void) {
+    const settings = ServerConnection.makeSettings();
+    const url = new URL("completion/status", settings.baseUrl);
+    let request: RequestInit = {
+        method: 'GET'
+    };
+    ServerConnection
+        .makeRequest(url.toString(), request, settings)
+        .then(response => response.json())
+        .then(it => {
+            try {
+                result(it.status);
+            } catch (e) {
+                result(false);
+            }
+        });
+
+}
+
 /**
  * A plugin providing full line code completion for notebooks.
  */
-const extension: JupyterLabPlugin<void> = {
+const extension: JupyterFrontEndPlugin<void> = {
     id: 'jupyterlab-code-completion',
     autoStart: true,
     requires: [ICommandPalette, INotebookTracker],
-    activate: (app: JupyterLab,
+    activate: (app: JupyterFrontEnd,
                palette: ICommandPalette,
                notebooks: INotebookTracker) => {
-        console.log('JupyterLab extension jupyterlab-code-completion is activated!');
+        console.log('JupyterLab extension jupyterlab-code-completion is activated!!');
+
+        checkCompletionServer(isRunning => console.log("Server running status: " + isRunning));
 
         // Create a handler for each notebook that is created.
         const handlers: { [id: string]: CompletionHandler } = {};
@@ -102,14 +134,15 @@ const extension: JupyterLabPlugin<void> = {
             }
         });
 
-        notebooks.widgetAdded.connect(() => {
-            const cell = notebooks.currentWidget.content.activeCell;
+
+        // Create a handler for each notebook that is created.
+        notebooks.widgetAdded.connect((sender, panel) => {
+            console.log("connect 1st");
+            const cell = panel.content.activeCell;
             const editor = cell && cell.editor;
-            //const session = panel.session;
-            const parent = notebooks.currentWidget;
-            //const connector = new CompletionConnector({session, editor});
-            const connector = new FullLineP3Connector({editor});
-            //const handler = manager.register({connector, editor, parent});
+            const session = panel.session;
+            const parent = panel;
+            const connector = new CompletionConnector({session, editor});
 
             const model = new CompleterModel();
             const completer = new Completer({editor, model});
@@ -137,8 +170,8 @@ const extension: JupyterLabPlugin<void> = {
             });
 
             // Listen for active cell changes.
-            notebooks.currentWidget.content.activeCellChanged.connect(() => {
-                const editor = notebooks.currentWidget.content.activeCell.editor;
+            panel.content.activeCellChanged.connect((sender, cell) => {
+                const editor = cell && cell.editor;
                 handler.editor = editor;
                 handler.connector = new FullLineP3Connector({editor});
             });
