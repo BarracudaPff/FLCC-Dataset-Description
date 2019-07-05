@@ -1,8 +1,22 @@
 from notebook.utils import url_path_join as url_join
 from notebook.base.handlers import APIHandler
+from abc import abstractmethod
 
 
-class Python3Handler(APIHandler):
+class StatusHandler(APIHandler):
+
+    def get(self):
+        self.finish({'status': True})
+
+
+class CompletionHandler(APIHandler):
+
+    @abstractmethod
+    def complete(self, code):
+        pass
+
+
+class Python3Handler(CompletionHandler):
     """
     Handler for code in Python3.
     """
@@ -12,11 +26,11 @@ class Python3Handler(APIHandler):
         POST request handler, get all completions from code.
         """
         code = self.get_json_body()['code']
-        some_list = self.completions(code)
+        some_list = self.complete(code)
         self.finish({'completions': some_list})
 
     # TODO implement this method
-    def completions(self, code):
+    def complete(self, code):
         """
         Here something happens with code
         @:return - list of completions
@@ -31,7 +45,8 @@ def setup_handlers(web_app):
 
     # possible expand here
     completion_handlers = [
-        ("/completion/python3", Python3Handler)
+        ("/completion/python3", Python3Handler),
+        ("/completion/status", StatusHandler)
     ]
 
     # add the base url to our paths
