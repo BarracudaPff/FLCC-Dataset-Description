@@ -39,6 +39,7 @@ export class FullLineP3Connector extends DataConnector<CompletionHandler.IReply,
     ): Promise<CompletionHandler.IReply> {
         return new Promise<CompletionHandler.IReply>(resolve => {
             const code = this._editor.model.value.text;
+            console.log("code is "+ code);
             Private.getCompletions(code, json => {
                 const cursor = this._editor.getCursorPosition();
                 const token = this._editor.getTokenForPosition(cursor);
