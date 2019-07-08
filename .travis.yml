@@ -1,0 +1,25 @@
+language:
+  python
+python:
+  - "3.6"
+sudo: false
+dist: trusty
+
+install:
+  - python -m pip install -q -U pip
+  - pip install -q -U notebook
+  - pip install --pre -U jupyterlab
+
+script:
+  - ./scripts/install.sh
+  - python -m jupyterlab.browser_check
+  - ./scripts/uninstall.sh
+  - ./scripts/dev.sh
+  - python -m jupyterlab & sleep 10
+  - curl http://localhost:8888/completion/status
+  - ./scripts/uninstall.sh
+
+cache:
+  pip: true
+  directories:
+    - $HOME/.npm
