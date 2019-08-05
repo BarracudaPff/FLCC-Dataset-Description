@@ -6,7 +6,7 @@ timeout=10m
 root=/tmp/root-repositories
 
 # Dump errored repos
-python3 ../src/prepare_repo_list.py
+python3 ../src/dump_error_reps.py
 
 # Prepare list of repositories
 python3 ../src/prepare_repo_list.py
