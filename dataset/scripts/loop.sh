@@ -15,7 +15,7 @@ sivas=/tmp/root-repositories/
 # The preferred slice for memory and speed is 500
 slice=500
 
-# Email to notify, type none to disable
+# Email to notify, type "none" to disable
 mail=mrm.kikll@gmail.com
 
 # Use this one for downloading from Borges
@@ -25,7 +25,7 @@ do
     python3 ${file} \
     --target_directory ${target} \
     --sivas_folder ${sivas} \
-    --sivas_folder none \
+    --email_notify none \
     --slice ${slice}
 done
 
