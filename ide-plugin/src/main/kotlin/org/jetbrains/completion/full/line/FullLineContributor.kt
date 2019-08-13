@@ -14,8 +14,7 @@ class FullLineContributor : CompletionContributor() {
     }
 
     private val contributors = listOf(
-        GPTCompletionProvider(URL, 5000),
-        DummyFullLineCompletionProvider()
+        GPTCompletionProvider(URL, 5000)
     )
 
     override fun fillCompletionVariants(parameters: CompletionParameters, result: CompletionResultSet) {
@@ -26,6 +25,7 @@ class FullLineContributor : CompletionContributor() {
                     .withTailText("  ${contributor.description()}", true)
                     .withTypeText(FULL_LINE_TAIL_TEXT)
                     .withIcon(PythonIcons.Python.Python)
+                    .withInsertHandler(MyInsertHandler())
                 result.addElement(PrioritizedLookupElement.withPriority(lookupElementBuilder, 200000.0))
             }
         }
