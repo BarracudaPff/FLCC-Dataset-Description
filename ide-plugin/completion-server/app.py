@@ -41,7 +41,6 @@ class Python3CharRnnHandler():
         some_list = self.complete(code, offset, token)
         return {'completions': some_list}
 
-    # TODO implement this method
     def complete(self, code: str, offset: int, token: str):
         """
         Here something happens with code
