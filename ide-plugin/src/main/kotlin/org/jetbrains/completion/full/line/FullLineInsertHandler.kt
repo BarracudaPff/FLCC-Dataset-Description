@@ -5,7 +5,7 @@ import com.intellij.codeInsight.completion.InsertionContext
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.openapi.util.text.StringUtil
 
-class MyInsertHandler(
+class FullLineInsertHandler(
     private val altHandler: CompletionTabListener = CompletionTabListener()
 ) : InsertHandler<LookupElement> {
     override fun handleInsert(context: InsertionContext, item: LookupElement) {

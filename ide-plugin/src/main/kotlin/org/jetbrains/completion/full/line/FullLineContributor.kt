@@ -32,7 +32,7 @@ class FullLineContributor : CompletionContributor() {
                     .withTailText("  ${provider.description}", true)
                     .withTypeText(FULL_LINE_TAIL_TEXT)
                     .withIcon(PythonIcons.Python.Python)
-                    .withInsertHandler(MyInsertHandler())
+                    .withInsertHandler(FullLineInsertHandler())
                 result.addElement(PrioritizedLookupElement.withPriority(lookupElementBuilder, 200000.0))
             }
         }
