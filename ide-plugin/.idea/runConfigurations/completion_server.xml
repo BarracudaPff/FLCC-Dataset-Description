@@ -1,9 +1,11 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="completion server" type="Python.FlaskServer">
     <module name="completion-server" />
+    <option name="target" value="$PROJECT_DIR$/completion-server/app.py" />
     <option name="targetType" value="PATH" />
     <option name="INTERPRETER_OPTIONS" value="" />
     <option name="PARENT_ENVS" value="true" />
+    <option name="SDK_HOME" value="C:\Projects\full-line-code-completion\ide-plugin\completion-server\venv\Scripts\python.exe" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/completion-server" />
     <option name="IS_MODULE_SDK" value="true" />
     <option name="ADD_CONTENT_ROOTS" value="true" />
