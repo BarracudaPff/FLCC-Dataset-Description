@@ -50,4 +50,4 @@ matrix:
 
       script:
         - ./gradlew clean test
-        - ./gradlew clean buildPlugin
+        - ./gradlew buildPlugin
