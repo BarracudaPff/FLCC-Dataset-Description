@@ -17,7 +17,7 @@ class FullLineInsertHandler(
             val token = ans.substring(0, indexes[1].startOffset)
             context.editor.document.replaceString(offset - ans.length, offset, token)
         }
-        if (context.completionChar != '\t') {
+        if (context.completionChar == '\t') {
             altHandler.nextLevel = true
         }
 
