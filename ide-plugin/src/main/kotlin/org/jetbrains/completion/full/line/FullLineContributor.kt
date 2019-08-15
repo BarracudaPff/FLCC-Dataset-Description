@@ -13,14 +13,14 @@ class FullLineContributor : CompletionContributor() {
         const val FULL_LINE_TAIL_TEXT = "full-line"
 
         private fun completionServerUrl(): String {
-            val url = Registry.get("full.line.completion.server.url")
-            val port = Registry.get("full.line.completion.server.port")
-            return "https://$url:$port"
+            val url = Registry.get("full.line.completion.server.url").asString()
+            val port = Registry.get("full.line.completion.server.port").asInteger()
+            return "http://$url:$port"
         }
     }
 
     private val providers: List<FullLineCompletionProvider> = listOf(
-//        NetworkCompletionProvider("gpt", TODO("add gpt handler address here")),
+//        NetworkCompletionProvider("gpt", "${completionServerUrl()}/completion/python3/gpt"),
         NetworkCompletionProvider("char-rnn", "${completionServerUrl()}/completion/python3")
     )
 
