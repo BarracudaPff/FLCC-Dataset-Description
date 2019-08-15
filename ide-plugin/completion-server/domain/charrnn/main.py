@@ -159,6 +159,9 @@ class ModelConnector:
         params_path = os.path.join(root, params_path)
         model_path = os.path.join(root, model_path)
 
+        assert os.path.exists(params_path) and os.path.exists(model_path), \
+            'Params and model not found. See README.md to download them'
+
         # read parameters
         with open(params_path, mode='r') as f:
             params = json.load(f)
