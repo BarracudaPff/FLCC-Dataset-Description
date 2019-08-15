@@ -17,8 +17,6 @@ class CompletionTabListener : Disposable, AnActionListener {
     private val idToCatch = "Choose Lookup Item Replace"
 
     init {
-        //val shortcut = KeyboardShortcut(KeyStroke.getKeyStroke(KeyEvent.VK_ALT, KeyEvent.ALT_DOWN_MASK), null)
-        //KeymapManager.getInstance().activeKeymap.addShortcut("Id here", shortcut)
         val busConnection = ApplicationManager.getApplication().messageBus.connect(this);
         busConnection.subscribe(AnActionListener.TOPIC, this);
     }
