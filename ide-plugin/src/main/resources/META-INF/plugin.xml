@@ -17,6 +17,11 @@
                                 id="FullLineCompletionContributor"
                                 order="first"
                                 implementationClass="org.jetbrains.completion.full.line.FullLineContributor"/>
+        <registryKey key="full.line.completion.server.url" defaultValue="localhost"
+                     description="Full line completion server address"/>
+
+        <registryKey key="full.line.completion.server.port" defaultValue="5000"
+                     description="Port for full line completion"/>
     </extensions>
 
 </idea-plugin>

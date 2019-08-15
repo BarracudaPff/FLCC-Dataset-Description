@@ -5,24 +5,31 @@ import com.intellij.codeInsight.completion.CompletionParameters
 import com.intellij.codeInsight.completion.CompletionResultSet
 import com.intellij.codeInsight.completion.PrioritizedLookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
+import com.intellij.openapi.util.registry.Registry
 import icons.PythonIcons
 
 class FullLineContributor : CompletionContributor() {
     companion object {
         const val FULL_LINE_TAIL_TEXT = "full-line"
-        private const val URL = "localhost"
+
+        private fun completionServerUrl(): String {
+            val url = Registry.get("full.line.completion.server.url")
+            val port = Registry.get("full.line.completion.server.port")
+            return "https://$url:$port"
+        }
     }
 
-    private val contributors = listOf(
-        GPTCompletionProvider(URL, 5000)
+    private val providers: List<FullLineCompletionProvider> = listOf(
+//        NetworkCompletionProvider("gpt", TODO("add gpt handler address here")),
+        NetworkCompletionProvider("char-rnn", "${completionServerUrl()}/completion/python3")
     )
 
     override fun fillCompletionVariants(parameters: CompletionParameters, result: CompletionResultSet) {
         val context = parameters.originalFile.text.substring(0, parameters.offset)
-        for (contributor in contributors) {
-            for (variant in contributor.getVariants(context)) {
+        for (provider in providers) {
+            for (variant in provider.getVariants(context)) {
                 val lookupElementBuilder = LookupElementBuilder.create(variant)
-                    .withTailText("  ${contributor.description()}", true)
+                    .withTailText("  ${provider.description}", true)
                     .withTypeText(FULL_LINE_TAIL_TEXT)
                     .withIcon(PythonIcons.Python.Python)
                     .withInsertHandler(MyInsertHandler())

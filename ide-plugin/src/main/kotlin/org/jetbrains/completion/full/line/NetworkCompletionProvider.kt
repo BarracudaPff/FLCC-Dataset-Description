@@ -8,13 +8,11 @@ import org.jetbrains.completion.full.line.models.FullLineCompletionRequest
 import org.jetbrains.completion.full.line.models.FullLineCompletionResult
 import java.util.concurrent.Callable
 
-class GPTCompletionProvider(private val url: String, private val port: Int) : FullLineCompletionProvider {
-
-    override fun description(): String = "gpt"
-
+class NetworkCompletionProvider(override val description: String, private val url: String) :
+    FullLineCompletionProvider {
     override fun getVariants(context: String): List<String> {
         return ApplicationManager.getApplication().executeOnPooledThread(Callable {
-            return@Callable HttpRequests.post("http://$url:$port/completion/python3", "application/json").gzip(true)
+            return@Callable HttpRequests.post(url, "application/json").gzip(true)
                 .connect { r ->
                     val offset = context.length
                     val token = StringUtil.getWordsIn(context).last()
