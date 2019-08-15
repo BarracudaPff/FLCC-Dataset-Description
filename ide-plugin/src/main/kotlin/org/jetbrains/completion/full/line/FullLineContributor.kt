@@ -25,6 +25,7 @@ class FullLineContributor : CompletionContributor() {
     )
 
     override fun fillCompletionVariants(parameters: CompletionParameters, result: CompletionResultSet) {
+        if (!Registry.`is`("full.line.completion.enable")) return
         val context = parameters.originalFile.text.substring(0, parameters.offset)
         for (provider in providers) {
             for (variant in provider.getVariants(context)) {

@@ -22,6 +22,9 @@
 
         <registryKey key="full.line.completion.server.port" defaultValue="5000"
                      description="Port for full line completion"/>
+
+        <registryKey key="full.line.completion.enable" defaultValue="true"
+                     description="Enable full line code completion"/>
     </extensions>
 
 </idea-plugin>
