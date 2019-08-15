@@ -34,6 +34,8 @@ matrix:
 
       install: true
 
+      before_install: cd ide-plugin
+
       jdk:
         - openjdk8
 
@@ -47,6 +49,5 @@ matrix:
           - $HOME/.gradle/wrapper/
 
       script:
-        - cd idea-plugin
         - ./gradlew clean test
         - ./gradlew clean buildPlugin
