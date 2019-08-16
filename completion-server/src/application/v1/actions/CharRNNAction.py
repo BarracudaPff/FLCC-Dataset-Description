@@ -21,7 +21,7 @@ schema = {
 }
 
 
-def char_rnn_action(json_data: json, charRnnService: CharRNNService) -> json:
+def char_rnn_action(json_data: json) -> json:
     try:
         validate(instance=json_data, schema=schema)
 
@@ -29,8 +29,8 @@ def char_rnn_action(json_data: json, charRnnService: CharRNNService) -> json:
         cursor_pos = json_data["cursor_pos"]
         filename = json_data["filename"]
 
-        result = charRnnService.getCompletions(code, cursor_pos, filename)
-        return result
+        # result = charRnnService.getCompletions(code, cursor_pos, filename)
+        return ['one two ', 'three']
 
     except ValidationError as e:
         exception_data = {
