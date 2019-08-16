@@ -28,8 +28,8 @@
     </extensions>
 
     <actions>
-        <action id="org.jetbrains.completion.full.line.NextLevelCompletionAction"
-                class="org.jetbrains.completion.full.line.NextLevelCompletionAction"
+        <action id="org.jetbrains.completion.full.line.actions.NextLevelCompletionAction"
+                class="org.jetbrains.completion.full.line.actions.NextLevelCompletionAction"
                 text="Completion&#39;s Next Level"
                 description="Next Level for Full Line Completion">
             <add-to-group group-id="CodeCompletionGroup" anchor="first"/>

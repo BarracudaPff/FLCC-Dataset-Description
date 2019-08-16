@@ -38,6 +38,6 @@ class CompletionTabListener : Disposable, AnActionListener {
 
     companion object {
         const val ID_TO_CATCH = "Choose Lookup Item Replace"
-        const val NEXT_LEVEL_ID = "org.jetbrains.completion.full.line.NextLevelCompletionAction"
+        const val NEXT_LEVEL_ID = "org.jetbrains.completion.full.line.actions.NextLevelCompletionAction"
     }
 }

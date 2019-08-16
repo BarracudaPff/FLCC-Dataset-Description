@@ -1,4 +1,4 @@
-package org.jetbrains.completion.full.line
+package org.jetbrains.completion.full.line.actions
 
 import com.intellij.codeInsight.completion.CodeCompletionHandlerBase
 import com.intellij.codeInsight.completion.CompletionType
