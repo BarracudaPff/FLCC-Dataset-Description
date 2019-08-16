@@ -19,7 +19,11 @@ def shutdown():
     return 'Server shutting down...'
 
 
-if __name__ == '__main__':
+def register_blueprint():
     app.register_blueprint(api, url_prefix='/v1')
+
+
+if __name__ == '__main__':
+    register_blueprint()
     app.debug = True
     app.run()

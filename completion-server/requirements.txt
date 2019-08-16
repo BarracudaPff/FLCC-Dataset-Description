@@ -24,3 +24,4 @@ tzlocal
 jsonschema
 Flask-Injector
 flask_injector
+Flask-Testing
