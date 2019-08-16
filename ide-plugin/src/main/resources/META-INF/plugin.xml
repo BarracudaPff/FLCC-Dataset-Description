@@ -26,13 +26,4 @@
         <registryKey key="full.line.completion.enable" defaultValue="true"
                      description="Enable full line code completion"/>
     </extensions>
-
-    <actions>
-        <action id="org.jetbrains.completion.full.line.actions.NextLevelCompletionAction"
-                class="org.jetbrains.completion.full.line.actions.NextLevelCompletionAction"
-                text="Completion&#39;s Next Level"
-                description="Next Level for Full Line Completion">
-            <add-to-group group-id="CodeCompletionGroup" anchor="first"/>
-        </action>
-    </actions>
 </idea-plugin>
