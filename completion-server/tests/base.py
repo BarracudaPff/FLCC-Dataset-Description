@@ -1,3 +1,4 @@
+import unittest
 import urllib.request
 
 from flask_testing import LiveServerTestCase
@@ -19,3 +20,7 @@ class MyTest(LiveServerTestCase):
         response = urllib.request.urlopen(url)
 
         self.assertEqual(response.code, 200)
+
+
+if __name__ == '__main__':
+    unittest.main()
