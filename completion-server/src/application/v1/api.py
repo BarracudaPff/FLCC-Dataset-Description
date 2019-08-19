@@ -2,28 +2,29 @@ import logging
 
 from flask import Blueprint, request
 
-from src.application.v1.actions.CharRNNAction import char_rnn_action
-from src.application.v1.actions.StatusAction import getStatus
+from src.application.v1.actions.CharRNNAction import CharRnnAction
+from src.application.v1.actions.GPTAction import GPTAction
+from src.application.v1.actions.StatusAction import StatusAction
 from src.application.v1.exceptions.ApiException import ApiException
 
 api = Blueprint('api', __name__)
 
 
 @api.route('status')
-def complete_char_rnn1():
-    return getStatus()
+def status(statusAction: StatusAction):
+    return statusAction.getStatus()
 
 
 @api.route('complete/charrnn', methods=['POST'])
-def completeCharRnn():
-    json = request.get_json()
-    answer = char_rnn_action(json)
-    return answer
+def completeCharRnn(charRnnAction: CharRnnAction):
+    json_data = request.get_json()
+    return charRnnAction.suggestions(json_data)
 
 
 @api.route('complete/gpt', methods=['POST'])
-def completeGpt():
-    pass
+def completeGpt(gptAction: GPTAction):
+    json_data = request.get_json()
+    return {'gpt': 'todo'}
 
 
 @api.errorhandler(ApiException)
