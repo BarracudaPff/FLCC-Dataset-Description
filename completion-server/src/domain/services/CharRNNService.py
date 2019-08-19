@@ -1,13 +1,12 @@
 import logging
 import time
 
-from src.infrastructure.charrnn.main import ModelConnector
 from src.infrastructure.charrnn.utils.utils import getOldPrefix
 
 
 class CharRNNService:
-    def __init__(self, params_name, model_name):
-        self.connector = ModelConnector(params_name, model_name, max_branches=25, max_chars=40)
+    def __init__(self, connector):
+        self.connector = connector
 
     def getCompletions(self, code, cursor_pos, filename):
         oldPrefix, oldSuffix = getOldPrefix(code, cursor_pos)
