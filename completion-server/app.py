@@ -1,7 +1,9 @@
 import logging
 
 from flask import Flask, request
+from flask_injector import FlaskInjector
 
+from module import AppModule
 from src.application.v1.api import api
 
 app = Flask(__name__)
@@ -21,6 +23,7 @@ def shutdown():
 
 def register_blueprint():
     app.register_blueprint(api, url_prefix='/v1')
+    FlaskInjector(app=app, modules=[AppModule])
 
 
 if __name__ == '__main__':
