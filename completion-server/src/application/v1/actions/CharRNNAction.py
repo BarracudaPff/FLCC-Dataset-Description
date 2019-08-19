@@ -2,8 +2,7 @@ import json
 
 from jsonschema import validate, ValidationError
 
-from src.application.v1.exceptions import ApiException
-from src.domain.services import CharRNNService
+from src.application.v1.exceptions.ApiException import ApiException
 
 # TODO(Move to config)
 schema = {
@@ -21,21 +20,24 @@ schema = {
 }
 
 
-def char_rnn_action(json_data: json) -> json:
-    try:
-        validate(instance=json_data, schema=schema)
+class CharRnnAction:
+    def __init__(self, charRnnService):
+        self.charRnnService = charRnnService
 
-        code = json_data["code"]
-        cursor_pos = json_data["cursor_pos"]
-        filename = json_data["filename"]
+    def suggestions(self, jsonData: json) -> json:
+        try:
+            validate(instance=jsonData, schema=schema)
 
-        # result = charRnnService.getCompletions(code, cursor_pos, filename)
-        return ['one two ', 'three']
+            code = jsonData["code"]
+            cursorPos = jsonData["cursor_pos"]
+            filename = jsonData["filename"]
 
-    except ValidationError as e:
-        exception_data = {
-            "message": e.message,
-            "validator": e.validator,
-            "value": e.validator_value
-        }
-        raise ApiException("Wrong parameters passed to char rnn", e, exception_data, 500)
+            return self.charRnnService.getCompletions(code, cursorPos, filename)
+
+        except ValidationError as e:
+            exceptionData = {
+                "message": e.message,
+                "validator": e.validator,
+                "value": e.validator_value
+            }
+            raise ApiException("Wrong parameters passed to char rnn", e, exceptionData, 500)
