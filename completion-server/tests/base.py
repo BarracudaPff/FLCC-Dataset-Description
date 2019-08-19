@@ -10,7 +10,7 @@ class MyTest(LiveServerTestCase):
 
     def create_app(self):
         app.register_blueprint()
-        app.app.config['TESTING'] = True
+        app.app.testing = True
         app.app.config['LIVESERVER_PORT'] = 0
         return app.app
 
