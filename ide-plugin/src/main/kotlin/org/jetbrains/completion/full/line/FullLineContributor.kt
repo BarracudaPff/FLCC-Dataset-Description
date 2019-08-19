@@ -17,6 +17,8 @@ class FullLineContributor : CompletionContributor() {
             val port = Registry.get("full.line.completion.server.port").asInteger()
             return "http://$url:$port"
         }
+
+        val insertHandler = FullLineInsertHandler()
     }
 
     private val providers: List<FullLineCompletionProvider> = listOf(
@@ -33,7 +35,7 @@ class FullLineContributor : CompletionContributor() {
                     .withTailText("  ${provider.description}", true)
                     .withTypeText(FULL_LINE_TAIL_TEXT)
                     .withIcon(PythonIcons.Python.Python)
-                    .withInsertHandler(FullLineInsertHandler())
+                    .withInsertHandler(insertHandler)
                 result.addElement(PrioritizedLookupElement.withPriority(lookupElementBuilder, 200000.0))
             }
         }

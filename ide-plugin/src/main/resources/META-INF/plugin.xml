@@ -26,5 +26,4 @@
         <registryKey key="full.line.completion.enable" defaultValue="true"
                      description="Enable full line code completion"/>
     </extensions>
-
 </idea-plugin>
