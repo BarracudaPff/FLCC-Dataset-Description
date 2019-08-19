@@ -2,7 +2,7 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 
-from src.domain.charrnn.utils.utils import get_model_from_params
+from src.domain.charrnn.utils.utils import get_model_from_params, one_hot_encode
 
 
 class ModelConnector:
@@ -71,7 +71,7 @@ class ModelConnector:
         :return:
         """
         x = np.array([[self.model.char2int[char]]])
-        x = self._one_hot_encode(x, len(self.model.chars))
+        x = one_hot_encode(x, len(self.model.chars))
         inputs = torch.from_numpy(x)
         h = tuple([each.data for each in h])
 

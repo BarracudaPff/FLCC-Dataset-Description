@@ -38,7 +38,7 @@ def get_model_from_params(params_path: str, model_path: str) -> CharRNN:
     return model
 
 
-def _one_hot_encode(arr, n_labels):
+def one_hot_encode(arr, n_labels):
     """
     Simple implementation of One-Hot-Encode
     """
