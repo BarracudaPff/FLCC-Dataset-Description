@@ -2,7 +2,7 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 
-from src.domain.charrnn.utils.utils import get_model_from_params, one_hot_encode
+from src.infrastructure.charrnn.utils.utils import get_model_from_params, one_hot_encode
 
 
 class ModelConnector:

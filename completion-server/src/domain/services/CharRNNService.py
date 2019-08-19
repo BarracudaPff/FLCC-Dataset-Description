@@ -1,8 +1,8 @@
 import logging
 import time
 
-from src.domain.charrnn.main import ModelConnector
-from src.domain.charrnn.utils.utils import getOldPrefix
+from src.infrastructure.charrnn.main import ModelConnector
+from src.infrastructure.charrnn.utils.utils import getOldPrefix
 
 
 class CharRNNService:

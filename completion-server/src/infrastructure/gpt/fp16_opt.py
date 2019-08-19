@@ -18,8 +18,8 @@ from torch import nn
 from torch.autograd import Variable
 from torch.nn.parameter import Parameter
 
-from src.domain.gpt.loss_scaler import DynamicLossScaler, LossScaler
-from src.domain.gpt.fp16util import model_grads_to_master_grads, master_params_to_model_params, clip_grad_norm
+from src.infrastructure.gpt.loss_scaler import DynamicLossScaler, LossScaler
+from src.infrastructure.gpt.fp16util import model_grads_to_master_grads, master_params_to_model_params, clip_grad_norm
 
 FLOAT_TYPES = (torch.FloatTensor, torch.cuda.FloatTensor)
 HALF_TYPES = (torch.HalfTensor, torch.cuda.HalfTensor)

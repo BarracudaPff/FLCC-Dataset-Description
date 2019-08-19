@@ -3,7 +3,7 @@ import json
 import numpy as np
 import torch
 
-from src.domain.charrnn.model import CharRNN
+from src.infrastructure.charrnn.model import CharRNN
 
 device = torch.device('cpu')
 
