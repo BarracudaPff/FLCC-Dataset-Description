@@ -5,7 +5,7 @@ import torch.nn.functional as F
 from src.infrastructure.charrnn.utils.utils import get_model_from_params, one_hot_encode
 
 
-class ModelConnector:
+class CharRnnConnector:
     device = torch.device('cpu')
 
     # Distribution for branching answers.
