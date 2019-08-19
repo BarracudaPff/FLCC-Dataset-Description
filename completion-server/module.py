@@ -5,6 +5,7 @@ from injector import Module, singleton
 
 from src.application.v1.actions.CharRNNAction import CharRnnAction
 from src.application.v1.actions.GPTAction import GPTAction
+from src.application.v1.actions.StatusAction import StatusAction
 from src.domain.services.CharRNNService import CharRNNService
 from src.domain.services.GPTService import GPTService
 
@@ -17,19 +18,21 @@ class AppModule(Module):
 
         charModelPath = app.config['MODEL_CHAR_RNN_CPYTHON']
         charParamPath = app.config['DATA_CHAR_RNN_CPYTHON']
-        charRnnService = self._configureCharRNNService(charModelPath, charParamPath)
+        charRnnService = self._configureCharRNNService(charParamPath, charModelPath)
 
         gptModelPath = app.config['MODEL_GPT']
         gptService = self._configureGPTService(gptModelPath)
 
         charRnnAction = CharRnnAction(charRnnService)
         gptAction = GPTAction(gptService)
+        statusAction = StatusAction()
 
         # Services
         binder.bind(GPTService      , to=gptService     , scope=singleton)
         binder.bind(CharRNNService  , to=charRnnService , scope=singleton)
 
         # Actions
+        binder.bind(StatusAction    , to=statusAction   , scope=singleton)
         binder.bind(GPTAction       , to=gptAction      , scope=singleton)
         binder.bind(CharRnnAction   , to=charRnnAction  , scope=singleton)
 
