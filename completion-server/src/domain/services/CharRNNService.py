@@ -14,6 +14,6 @@ class CharRNNService:
         filename = filename
 
         t1 = time.time()
-        answers = self.connector.get_suggestions(code, 'imp')
+        answers = self.connector.get_suggestions(code, code)
         logging.info(f"Time to predict: {time.time() - t1}")
-        return answers
+        return {"answers": answers}
