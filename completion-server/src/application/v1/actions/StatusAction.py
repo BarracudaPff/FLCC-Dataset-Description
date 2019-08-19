@@ -1,5 +1,7 @@
-from flask import jsonify
+import json
 
 
-def getStatus() -> jsonify:
-    return jsonify({"status": True})
+class StatusAction:
+
+    def getStatus(self) -> json:
+        return {"status": True}
