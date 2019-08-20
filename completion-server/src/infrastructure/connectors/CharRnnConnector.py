@@ -3,9 +3,10 @@ import torch
 import torch.nn.functional as F
 
 from src.infrastructure.charrnn.utils.utils import get_model_from_params, one_hot_encode
+from src.infrastructure.connectors import Connector
 
 
-class CharRnnConnector:
+class CharRnnConnector(Connector):
     device = torch.device('cpu')
 
     # Distribution for branching answers.
@@ -27,7 +28,7 @@ class CharRnnConnector:
     # TODO Add check for non-entry into the dictionary
     sp_char = '⁂'
 
-    def __init__(self, params_path: str, model_path: str, max_branches: int = 20, max_chars: int = 20):
+    def __init__(self, model_name: str, max_branches: int = 20, max_chars: int = 20):
         """
         One char predicts for 0.0016 sec, so 20 branches with 20 chars will be maximum 0.64 sec
         Be aware of getting more than 1.5 seconds, also every next branch will have less match percentage
@@ -37,9 +38,12 @@ class CharRnnConnector:
         :param max_branches: Maximum amount of suggestions
         :param max_chars: Maximum amount of chars in one suggestion
         """
+        super().__init__(model_name)
         self.max_branches = max_branches
         self.max_chars = max_chars
-        char_rnn = get_model_from_params(params_path, model_path)
+
+    def connect(self, params, model):
+        char_rnn = get_model_from_params(params, model)
         char_rnn.to(self.device)
         char_rnn.eval()
         self.model = char_rnn

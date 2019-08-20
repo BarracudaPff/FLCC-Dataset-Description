@@ -1,3 +1,4 @@
+import json
 import logging
 
 from flask import Flask, request
@@ -7,7 +8,9 @@ from module import AppModule
 from src.application.v1.api import api
 
 app = Flask(__name__)
-app.config.from_pyfile('config.cfg')
+with open('config.json') as f:
+    config = json.load(f)
+app.config.update(config)
 
 logging.basicConfig(format="%(asctime)s\t:\t%(levelname)s\t:\t%(name)s\t:\t%(message)s")
 logging.getLogger().setLevel(logging.DEBUG)

@@ -1,3 +1,3 @@
 class GPTService:
-    def __init__(self, modelPath):
-        print(modelPath + '!')
+    def __init__(self, gptConnector):
+        print(f'TODO: {str(gptConnector)}')
