@@ -1,4 +1,5 @@
 import os
+from urllib.request import urlopen
 
 from flask import Flask
 from injector import Module, singleton
@@ -9,6 +10,7 @@ from src.application.v1.actions.StatusAction import StatusAction
 from src.domain.services.CharRNNService import CharRNNService
 from src.domain.services.GPTService import GPTService
 from src.infrastructure.connectors.CharRnnConnector import CharRnnConnector
+from src.infrastructure.connectors.GPTConnector import GPTConnector
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 
@@ -16,17 +18,15 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 class AppModule(Module):
     def configure(self, binder):
         app = binder.injector.get(Flask)
-        self.testing = app.testing
 
-        gptModelPath    = app.config['MODEL_GPT']
-        charModelPath   = app.config['MODEL_CHAR_RNN_CPYTHON']
-        charParamPath   = app.config['DATA_CHAR_RNN_CPYTHON']
-        maxBranches     = app.config['MAX_CHARS']
-        maxChars        = app.config['MAX_BRANCHES']
+        models = app.config['models']
+        maxBranches = app.config['maxBranches']
+        maxChars = app.config['maxChars']
 
-        charRnnConnector = self._configureCharRNNService(charParamPath, charModelPath, maxBranches, maxChars)
+        charRnnConnector = CharRnnConnector(_setupModels(models['CharRNN']), maxBranches, maxChars)
+        gptConnector = GPTConnector(_setupModels(models['GPT']))
 
-        gptService = self._configureGPTService(gptModelPath)
+        gptService = GPTService(gptConnector)
         charRnnService = CharRNNService(charRnnConnector)
 
         statusAction = StatusAction()
@@ -34,35 +34,31 @@ class AppModule(Module):
         charRnnAction = CharRnnAction(charRnnService)
 
         # Connectors
-        binder.bind(CharRnnConnector, to=charRnnConnector, scope=singleton)
+        binder.bind(CharRnnConnector, to=charRnnConnector   , scope=singleton)
+        binder.bind(GPTConnector    , to=gptConnector       , scope=singleton)
 
         # Services
-        binder.bind(GPTService      , to=gptService     , scope=singleton)
-        binder.bind(CharRNNService  , to=charRnnService , scope=singleton)
+        binder.bind(GPTService      , to=gptService         , scope=singleton)
+        binder.bind(CharRNNService  , to=charRnnService     , scope=singleton)
 
         # Actions
-        binder.bind(StatusAction    , to=statusAction   , scope=singleton)
-        binder.bind(GPTAction       , to=gptAction      , scope=singleton)
-        binder.bind(CharRnnAction   , to=charRnnAction  , scope=singleton)
+        binder.bind(StatusAction    , to=statusAction       , scope=singleton)
+        binder.bind(GPTAction       , to=gptAction          , scope=singleton)
+        binder.bind(CharRnnAction   , to=charRnnAction      , scope=singleton)
 
-    def _configureCharRNNService(self, paramsPath, modelPath, maxBranches, maxChars) -> CharRnnConnector:
-        # init path for parameters and model
-        paramsPath = os.path.join(ROOT, paramsPath)
-        modelPath = os.path.join(ROOT, modelPath)
 
-        # TODO (Download model here if we want)
-        if self.testing:
-            assert os.path.exists(paramsPath) and os.path.exists(modelPath), \
-                'Params and model not found. See README.md to download them'
-        return CharRnnConnector(paramsPath, modelPath, maxBranches, maxChars)
+def _setupModels(config) -> str:
+    mainInst = config['main']
+    for instance in config['instances']:
+        _downloadFileFromGoogleDrive(instance['model'], 'models/' + str(instance))
+        _downloadFileFromGoogleDrive(instance['data'], 'models/data/' + str(instance))
+    return mainInst
 
-    def _configureGPTService(self, modelPath) -> GPTService:
-        modelPath = os.path.join(ROOT, modelPath)
 
-        # TODO (Download model here if we want)
-
-        if self.testing:
-            assert os.path.exists(modelPath), \
-                'Params and model not found. See README.md to download them'
-
-        return GPTService(modelPath)
+def _downloadFileFromGoogleDrive(fileId, filename):
+    url = 'https://drive.google.com/uc?export=download&id=' + fileId
+    print(url)
+    response = urlopen(url).read()
+    with open(filename, 'wb') as writer:
+        writer.write(response)
+    return filename
