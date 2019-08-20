@@ -1,3 +1,4 @@
+import logging
 import os
 from urllib.request import urlopen
 
@@ -50,15 +51,20 @@ class AppModule(Module):
 def _setupModels(config) -> str:
     mainInst = config['main']
     for instance in config['instances']:
-        _downloadFileFromGoogleDrive(instance['model'], 'models/' + str(instance))
-        _downloadFileFromGoogleDrive(instance['data'], 'models/data/' + str(instance))
+        instanceConfig = config['instances'][instance]
+        _downloadFile(instanceConfig['model'], 'models/' + instance     , instanceConfig['reload'])
+        _downloadFile(instanceConfig['data'] , 'models/data/' + instance, instanceConfig['reload'])
     return mainInst
 
 
-def _downloadFileFromGoogleDrive(fileId, filename):
-    url = 'https://drive.google.com/uc?export=download&id=' + fileId
-    print(url)
+def _downloadFile(url, filename, reload):
+    if url is None:
+        return
+
+    if not reload and os.path.isfile(filename):
+        return
+
     response = urlopen(url).read()
     with open(filename, 'wb') as writer:
         writer.write(response)
-    return filename
+    logging.info(f"File {filename} downloaded from {url}")
