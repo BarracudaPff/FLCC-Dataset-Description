@@ -4,12 +4,14 @@
       "main": "charrnn-cpython",
       "instances": {
         "charrnn-cpython": {
-          "model": "104i1vrHkxm1grrmjvnKG9nYGkJtIq7UA",
-          "data": "1qLLi6rr98BQpoF40bXDpsf6FyX75BUVB"
+          "model": "https://drive.google.com/uc?export=download&id=104i1vrHkxm1grrmjvnKG9nYGkJtIq7UA",
+          "data": "https://drive.google.com/uc?export=download&id=1qLLi6rr98BQpoF40bXDpsf6FyX75BUVB",
+          "reload": false
         },
         "charrnn-cpython-decoded": {
-          "model": "1VLJ4ymu9plXocYjqTSt3356X0XUJni7I",
-          "data": "1hk-Z9lsAjcYNLy_8QFRdxG105qICjTGF"
+          "model": "https://drive.google.com/uc?export=download&id=1VLJ4ymu9plXocYjqTSt3356X0XUJni7I",
+          "data": "https://drive.google.com/uc?export=download&id=1hk-Z9lsAjcYNLy_8QFRdxG105qICjTGF",
+          "reload": false
         }
       }
     },
@@ -17,8 +19,9 @@
       "main": "checkpoint0",
       "instances": {
         "checkpoint0": {
-          "model": "",
-          "data": ""
+          "model": "https://github-lm.s3.amazonaws.com/github-projects_p3dn-2d_best.pt",
+          "data": null,
+          "reload": false
         }
       }
     }
