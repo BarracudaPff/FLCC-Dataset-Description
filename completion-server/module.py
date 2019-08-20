@@ -64,7 +64,9 @@ def _downloadFile(url, filename, reload):
     if not reload and os.path.isfile(filename):
         return
 
-    response = urlopen(url).read()
+    with urlopen(url) as urlReader:
+        response = urlReader.read()
+
     with open(filename, 'wb') as writer:
         writer.write(response)
     logging.info(f"File {filename} downloaded from {url}")
