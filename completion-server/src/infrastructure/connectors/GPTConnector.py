@@ -1,0 +1,2 @@
+class GPTConnector:
+    pass

@@ -1,3 +1,5 @@
+injector
+flask
 torch==1.1.0
 pytz
 numpy
@@ -19,3 +21,7 @@ boto3
 paramiko
 portpicker
 tzlocal
+jsonschema
+Flask-Injector
+flask_injector
+Flask-Testing
