@@ -16,7 +16,6 @@ class NetworkCompletionProvider(override val description: String, private val ur
             ApplicationManager.getApplication().executeOnPooledThread(Callable {
                 return@Callable HttpRequests.post(url, "application/json").gzip(true)
                     .connect { r ->
-                        println(filename)
                         val offset = context.length
                         val token = StringUtil.getWordsIn(context).last()
                         val request = FullLineCompletionRequest(context, token, offset, filename)
