@@ -15,12 +15,12 @@
     <extensions defaultExtensionNs="com.intellij">
         <completion.contributor language="Python"
                                 id="FullLineCompletionContributor"
-                                order="first"
+                                order="last"
                                 implementationClass="org.jetbrains.completion.full.line.FullLineContributor"/>
-        <registryKey key="full.line.completion.server.url" defaultValue="localhost"
+        <registryKey key="full.line.completion.server.url" defaultValue="54.92.216.222"
                      description="Full line completion server address"/>
 
-        <registryKey key="full.line.completion.server.port" defaultValue="5000"
+        <registryKey key="full.line.completion.server.port" defaultValue="5001"
                      description="Port for full line completion"/>
 
         <registryKey key="full.line.completion.enable" defaultValue="true"
