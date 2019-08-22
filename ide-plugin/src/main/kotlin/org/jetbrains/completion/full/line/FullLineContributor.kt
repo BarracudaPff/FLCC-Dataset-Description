@@ -34,10 +34,8 @@ class FullLineContributor : CompletionContributor() {
         if (!Registry.`is`("full.line.completion.enable"))
             return
 
-        val project = parameters.editor.project?: return println("No project for editor ${parameters.editor}")
         val context = parameters.originalFile.text.substring(0, parameters.offset)
-
-        val filename = FileEditorManager.getInstance(project).selectedFiles[0].name
+        val filename = parameters.originalFile.name
 
         for (provider in providers) {
             for (variant in provider.getVariants(context, filename)) {
