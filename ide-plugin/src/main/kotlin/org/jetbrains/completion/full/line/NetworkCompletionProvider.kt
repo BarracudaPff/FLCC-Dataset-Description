@@ -1,7 +1,8 @@
 package org.jetbrains.completion.full.line
 
 import com.google.gson.Gson
-import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.ex.ApplicationUtil
+import com.intellij.openapi.progress.EmptyProgressIndicator
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.util.io.HttpRequests
 import org.jetbrains.completion.full.line.FullLineContributor.Companion.LOG
@@ -9,7 +10,6 @@ import org.jetbrains.completion.full.line.models.FullLineCompletionRequest
 import org.jetbrains.completion.full.line.models.FullLineCompletionResult
 import java.util.concurrent.Callable
 import java.util.concurrent.ExecutionException
-import java.util.concurrent.TimeUnit
 
 class NetworkCompletionProvider(override val description: String, private val url: String) :
     FullLineCompletionProvider {
@@ -27,15 +27,18 @@ class NetworkCompletionProvider(override val description: String, private val ur
 
                         Gson().fromJson(r.reader, FullLineCompletionResult::class.java).completions
                     }
-            }).get(10, TimeUnit.SECONDS)
+            }, EmptyProgressIndicator())
             LOG.debug("Time to predict completions is ${System.currentTimeMillis() - start}")
             completions
-        } catch (e: HttpRequests.HttpStatusException){
-            LOG.error("Something wrong with completion server. $e", e)
-            emptyList()
+        } catch (e: HttpRequests.HttpStatusException) {
+            logError("Something wrong with completion server. $e", e)
         } catch (e: ExecutionException) {
-            LOG.error("Error while getting completions from server", e)
-            emptyList()
+            logError("Error while getting completions from server", e)
         }
+    }
+
+    private fun logError(msg: String, error: Exception): List<String> {
+        LOG.error(msg, error)
+        return emptyList()
     }
 }
