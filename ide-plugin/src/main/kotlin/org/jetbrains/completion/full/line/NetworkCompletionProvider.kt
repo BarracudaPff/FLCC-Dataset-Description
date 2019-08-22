@@ -10,13 +10,14 @@ import java.util.concurrent.Callable
 
 class NetworkCompletionProvider(override val description: String, private val url: String) :
     FullLineCompletionProvider {
-    override fun getVariants(context: String): List<String> {
+    override fun getVariants(context: String, filename: String): List<String> {
         return ApplicationManager.getApplication().executeOnPooledThread(Callable {
             return@Callable HttpRequests.post(url, "application/json").gzip(true)
                 .connect { r ->
+                    println(filename)
                     val offset = context.length
                     val token = StringUtil.getWordsIn(context).last()
-                    val request = FullLineCompletionRequest(StringUtil.escapeStringCharacters(context), token, offset)
+                    val request = FullLineCompletionRequest(context, token, offset, filename)
 
                     r.write(Gson().toJson(request))
 
