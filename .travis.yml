@@ -32,9 +32,11 @@ matrix:
     - language:
         java
 
-      install: true
+      install:
+        true
 
-      before_install: cd ide-plugin
+      before_install:
+        cd ide-plugin
 
       jdk:
         - openjdk8
@@ -50,4 +52,24 @@ matrix:
 
       script:
         - ./gradlew clean test
-        - ./gradlew buildPlugin
+        - ./gradlew clean buildPlugin
+
+    # Flask Server check
+    - language:
+        python
+
+      python:
+        - 3.7.4
+
+      before_install:
+        cd completion-server
+
+      install:
+        pip install -r requirements.txt
+
+      before_script:
+        - export FLASK_APP="$TRAVIS_BUILD_DIR/completion-server/app.py"
+        - export FLASK_DEBUG=1
+
+      script:
+        PYTHONPATH=. python3 -m cProfile -o perf.prof tests/base.py

@@ -1,14 +1,12 @@
-import json
-import os
-
 import numpy as np
 import torch
 import torch.nn.functional as F
 
-from .model import CharRNN
+from src.infrastructure.charrnn.utils.utils import get_model_from_params, one_hot_encode
+from src.infrastructure.connectors import Connector
 
 
-class ModelConnector:
+class CharRnnConnector(Connector):
     device = torch.device('cpu')
 
     # Distribution for branching answers.
@@ -30,9 +28,8 @@ class ModelConnector:
     # TODO Add check for non-entry into the dictionary
     sp_char = '⁂'
 
-    def __init__(self, params_path: str, model_path: str, max_branches: int = 20, max_chars: int = 20):
+    def __init__(self, model_name: str, max_branches: int = 20, max_chars: int = 20):
         """
-        TODO(Upd doc)
         One char predicts for 0.0016 sec, so 20 branches with 20 chars will be maximum 0.64 sec
         Be aware of getting more than 1.5 seconds, also every next branch will have less match percentage
 
@@ -41,9 +38,12 @@ class ModelConnector:
         :param max_branches: Maximum amount of suggestions
         :param max_chars: Maximum amount of chars in one suggestion
         """
+        super().__init__(model_name)
         self.max_branches = max_branches
         self.max_chars = max_chars
-        char_rnn = self._get_model_from_params(params_path, model_path)
+
+    def connect(self, params, model):
+        char_rnn = get_model_from_params(params, model)
         char_rnn.to(self.device)
         char_rnn.eval()
         self.model = char_rnn
@@ -75,7 +75,7 @@ class ModelConnector:
         :return:
         """
         x = np.array([[self.model.char2int[char]]])
-        x = self._one_hot_encode(x, len(self.model.chars))
+        x = one_hot_encode(x, len(self.model.chars))
         inputs = torch.from_numpy(x)
         h = tuple([each.data for each in h])
 
@@ -133,45 +133,3 @@ class ModelConnector:
                         # if percents[num] > percent_branch:
                         res += self._recursive(h, line + chars[num], True)
                     return res
-
-    @staticmethod
-    def _one_hot_encode(arr, n_labels):
-        """
-        Simple implementation of One-Hot-Encode
-        """
-        one_hot = np.zeros((np.multiply(*arr.shape), n_labels), dtype=np.float32)
-        one_hot[np.arange(one_hot.shape[0]), arr.flatten()] = 1.
-        one_hot = one_hot.reshape((*arr.shape, n_labels))
-        return one_hot
-
-    @staticmethod
-    def _get_model_from_params(params_path: str, model_path: str) -> CharRNN:
-        """
-        Load model and parameters from files
-
-        :param params_path: Path to parameters.
-        :param model_path: Path to Model data
-        :return: CharRNN model
-        """
-        root = os.path.dirname(os.path.abspath(__file__))
-
-        # init path for parameters and model
-        params_path = os.path.join(root, params_path)
-        model_path = os.path.join(root, model_path)
-
-        assert os.path.exists(params_path) and os.path.exists(model_path), \
-            'Params and model not found. See README.md to download them'
-
-        # read parameters
-        with open(params_path, mode='r') as f:
-            params = json.load(f)
-
-        # create and load model
-        model = CharRNN(tokens=params['chars'],
-                        device=torch.device('cpu'),
-                        n_hidden=params['n_hidden'],
-                        n_layers=params['n_layers'],
-                        drop_prob=params['drop_prob'],
-                        lr=params['lr'])
-        model.load_state_dict(torch.load(model_path, map_location='cpu'))
-        return model
