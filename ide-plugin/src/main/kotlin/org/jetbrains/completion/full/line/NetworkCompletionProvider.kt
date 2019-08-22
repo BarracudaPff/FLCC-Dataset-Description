@@ -16,7 +16,7 @@ class NetworkCompletionProvider(override val description: String, private val ur
     override fun getVariants(context: String, filename: String): List<String> {
         return try {
             val start = System.currentTimeMillis()
-            val completions = ApplicationManager.getApplication().executeOnPooledThread(Callable {
+            val completions = ApplicationUtil.runWithCheckCanceled(Callable {
                 return@Callable HttpRequests.post(url, "application/json").gzip(true)
                     .connect { r ->
                         val offset = context.length
