@@ -5,6 +5,7 @@ import com.intellij.codeInsight.completion.CompletionParameters
 import com.intellij.codeInsight.completion.CompletionResultSet
 import com.intellij.codeInsight.completion.PrioritizedLookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
+import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.util.registry.Registry
 import icons.PythonIcons
 
@@ -22,15 +23,21 @@ class FullLineContributor : CompletionContributor() {
     }
 
     private val providers: List<FullLineCompletionProvider> = listOf(
-//        NetworkCompletionProvider("gpt", "${completionServerUrl()}/completion/python3/gpt"),
-        NetworkCompletionProvider("char-rnn", "${completionServerUrl()}/completion/python3")
+        NetworkCompletionProvider("gpt", "${completionServerUrl()}/v1/complete/gpt"),
+        NetworkCompletionProvider("char-rnn", "${completionServerUrl()}/v1/complete/charrnn")
     )
 
     override fun fillCompletionVariants(parameters: CompletionParameters, result: CompletionResultSet) {
-        if (!Registry.`is`("full.line.completion.enable")) return
+        if (!Registry.`is`("full.line.completion.enable"))
+            return
+
+        val project = parameters.editor.project?: return println("No project for editor ${parameters.editor}")
         val context = parameters.originalFile.text.substring(0, parameters.offset)
+
+        val filename = FileEditorManager.getInstance(project).selectedFiles[0].name
+
         for (provider in providers) {
-            for (variant in provider.getVariants(context)) {
+            for (variant in provider.getVariants(context, filename)) {
                 val lookupElementBuilder = LookupElementBuilder.create(variant)
                     .withTailText("  ${provider.description}", true)
                     .withTypeText(FULL_LINE_TAIL_TEXT)
