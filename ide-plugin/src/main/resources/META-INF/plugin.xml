@@ -1,0 +1,29 @@
+<idea-plugin>
+    <id>org.jetbrains.completion.full.line</id>
+    <name>Full Line Code Completion</name>
+    <version>0.0.1</version>
+    <idea-version since-build="192"/>
+    <vendor url="https://www.jetbrains.com">JetBrains</vendor>
+
+    <description><![CDATA[
+           <p>A prototype for showing full line code completion variants in IntelliJ</p>
+    ]]></description>
+
+    <depends>com.intellij.modules.lang</depends>
+    <depends>com.intellij.modules.python</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <completion.contributor language="Python"
+                                id="FullLineCompletionContributor"
+                                order="last"
+                                implementationClass="org.jetbrains.completion.full.line.FullLineContributor"/>
+        <registryKey key="full.line.completion.server.url" defaultValue="54.92.216.222"
+                     description="Full line completion server address"/>
+
+        <registryKey key="full.line.completion.server.port" defaultValue="5001"
+                     description="Port for full line completion"/>
+
+        <registryKey key="full.line.completion.enable" defaultValue="true"
+                     description="Enable full line code completion"/>
+    </extensions>
+</idea-plugin>

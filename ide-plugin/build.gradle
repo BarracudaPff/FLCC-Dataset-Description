@@ -1,0 +1,41 @@
+plugins {
+    id 'java'
+    id 'org.jetbrains.intellij' version '0.4.9'
+    id 'org.jetbrains.kotlin.jvm' version '1.3.41'
+}
+
+group 'org.jetbrains.completion.full.line'
+version '0.0.1'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    maven { url "https://www.jetbrains.com/intellij-repository/snapshots" }
+}
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+
+intellij {
+    type 'PC'
+    version 'PC-2019.2'
+    updateSinceUntilBuild false
+}
+
+runIde {
+    jvmArgs '-Xmx1G'
+}
+
+test {
+    useJUnitPlatform()
+}

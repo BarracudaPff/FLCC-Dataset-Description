@@ -1,25 +1,75 @@
-language:
-  python
-python:
-  - "3.6"
-sudo: false
-dist: trusty
+matrix:
+  include:
 
-install:
-  - python -m pip install -q -U pip
-  - pip install -q -U notebook
-  - pip install --pre -U jupyterlab
+    # JupyterLab plugin check
+    - language:
+        python
+      python:
+        - "3.6"
+      sudo: false
+      dist: trusty
 
-script:
-  - ./scripts/install.sh
-  - python -m jupyterlab.browser_check
-  - ./scripts/uninstall.sh
-  - ./scripts/dev.sh
-  - python -m jupyterlab & sleep 10
-  - curl http://localhost:8888/completion/status
-  - ./scripts/uninstall.sh
+      install:
+        - python -m pip install -q -U pip
+        - pip install -q -U notebook
+        - pip install --pre -U jupyterlab
 
-cache:
-  pip: true
-  directories:
-    - $HOME/.npm
+      script:
+        - ./scripts/install.sh
+        - python -m jupyterlab.browser_check
+        - ./scripts/uninstall.sh
+        - ./scripts/dev.sh
+        - python -m jupyterlab & sleep 10
+        - curl http://localhost:8888/completion/status
+        - ./scripts/uninstall.sh
+
+      cache:
+        pip: true
+        directories:
+          - $HOME/.npm
+
+    # PyCharm Plugin check
+    - language:
+        java
+
+      install:
+        true
+
+      before_install:
+        cd ide-plugin
+
+      jdk:
+        - openjdk8
+
+      before_cache:
+        - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+        - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+
+      cache:
+        directories:
+          - $HOME/.gradle/caches/
+          - $HOME/.gradle/wrapper/
+
+      script:
+        - ./gradlew clean test
+        - ./gradlew clean buildPlugin
+
+    # Flask Server check
+    - language:
+        python
+
+      python:
+        - 3.7.4
+
+      before_install:
+        cd completion-server
+
+      install:
+        pip install -r requirements.txt
+
+      before_script:
+        - export FLASK_APP="$TRAVIS_BUILD_DIR/completion-server/app.py"
+        - export FLASK_DEBUG=1
+
+      script:
+        PYTHONPATH=. python3 -m cProfile -o perf.prof tests/base.py
