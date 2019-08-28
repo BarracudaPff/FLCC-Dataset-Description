@@ -4,6 +4,8 @@
         <modules>
             <module fileurl="file://$PROJECT_DIR$/completion-server/.idea/completion-server.iml"
                     filepath="$PROJECT_DIR$/completion-server/.idea/completion-server.iml"/>
+            <module fileurl="file://$PROJECT_DIR$/dataset/.idea/dataset.iml"
+                    filepath="$PROJECT_DIR$/dataset/dataset.iml"/>
             <module fileurl="file://$PROJECT_DIR$/.idea/full-line-code-completion.iml"
                     filepath="$PROJECT_DIR$/.idea/full-line-code-completion.iml"/>
         </modules>
