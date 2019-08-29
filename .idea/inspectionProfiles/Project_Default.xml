@@ -18,5 +18,13 @@
         </list>
       </option>
     </inspection_tool>
+    <inspection_tool class="PyShadowingBuiltinsInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <option name="ignoredNames">
+        <list>
+          <option value="dir" />
+          <option value="slice" />
+        </list>
+      </option>
+    </inspection_tool>
   </profile>
 </component>
