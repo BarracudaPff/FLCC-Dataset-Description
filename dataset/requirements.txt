@@ -3,4 +3,6 @@ PyYAML
 colorama
 tqdm
 glob2
-psycopg2 # On MacOS first download postgesql with "brew install postgresql"
+# On MacOS first download postgesql with "brew install postgresql"
+# On Linux first download postgesql with "sudo apt-get install postgresql -y && sudo apt-get install python-psycopg2 -y && sudo apt-get install libpq-dev -y"
+psycopg2
