@@ -1,4 +1,4 @@
-from extensions import initExtensions
+from src.extensions import initExtensions
 from utils import BaseDataClass
 
 
@@ -8,7 +8,7 @@ class TestExtensions(BaseDataClass):
         languages = ["Go", "Java", "CSS"]
         extensions = initExtensions(languages)
         if languages is not None:
-            languagesFromPath = [extension['path'].split('/')[0] for extension in extensions]
+            languagesFromPath = [extensions[extension].split('/')[0] for extension in extensions]
             for language in languages:
                 self.assertIn(language, languagesFromPath)
 

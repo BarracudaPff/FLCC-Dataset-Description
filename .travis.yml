@@ -73,3 +73,19 @@ matrix:
 
       script:
         PYTHONPATH=. python3 -m cProfile -o perf.prof tests/base.py
+
+    # Dataset check
+    - language:
+        python
+
+      python:
+        - 3.7.4
+
+      before_install:
+        cd dataset
+
+      install:
+        pip install -r requirements.txt
+
+      script:
+        PYTHONPATH=. python3 -m cProfile -o perf.prof tests/base.py
