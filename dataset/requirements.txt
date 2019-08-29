@@ -1,0 +1,6 @@
+parameterized
+PyYAML
+colorama
+tqdm
+glob2
+psycopg2 # On MacOS first download postgesql with "brew install postgresql"
