@@ -1,7 +1,7 @@
 import json
 import os
 
-dataDir = '../data'
+dataDir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../data/')
 
 
 def writeFile(filename: str, data):
@@ -20,11 +20,14 @@ def readFile(filename: str):
 
 def writeLinesFile(filename: str, data, appendWithNewLine: bool = False):
     if appendWithNewLine:
-        for i in range(len(data)):
-            data[i] = data[i] + '\n'
+        dataWithNewLine = [dat + '\n' for dat in data]
+    else:
+        dataWithNewLine = data.copy()
+        dataWithNewLine.append('\n')
 
+    print(dataWithNewLine)
     with open(_unite(filename), 'w') as w:
-        w.writelines(data)
+        w.writelines(dataWithNewLine)
 
 
 def readLinesFile(filename: str):
