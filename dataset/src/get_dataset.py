@@ -10,7 +10,7 @@ import glob2
 from tqdm import tqdm
 
 from src.extensions import initExtensions
-from src.files import readLinesFile, writeLinesFile
+from src.files import readLinesFile, writeLinesFile, dataDir
 from src.mail import MailNotifier
 
 subject = '''\
@@ -27,7 +27,7 @@ parser.add_argument('--use_pga', type=bool, help='Use PGA', default=False)
 parser.add_argument('--slice', type=int, help='Amount of files from sivas_folder', default=500)
 
 temp_folder = 'temp'
-list_siva = 'list-siva.txt'
+list_siva = 'siva.txt'
 list_siva_temp = 'list-siva-temp.txt'
 hide_output = ' > /dev/null'
 
@@ -46,7 +46,9 @@ def checkout_branch():
     if branches:
         branches_list = branches.decode("utf-8").split("\n")
         branch = re.findall(r"[A-Za-z0-9-/]+", branches_list[0])
-        os.system("git --git-dir=siva/.git --work-tree=siva/ checkout " + branch[0])
+        subprocess.call(("git --git-dir=siva/.git --work-tree=siva/ checkout " + branch[0]).split(),
+                        stdout=open(os.devnull, 'w'), stderr=subprocess.STDOUT)
+        # s.system("git --git-dir=siva/.git --work-tree=siva/ checkout " + branch[0] + hide_output)
         return True
     else:
         return False
@@ -60,7 +62,10 @@ def copy_one_file(file, file_name, destination):
     if ext in extensions:
         new_name = (base + '_' + str(time.time()) + ext)
         sortedDestination = extensions[ext]
-        shutil.copy(file_name, destination + '/' + sortedDestination + '/' + new_name)
+        shutil.copy(file_name, destination + sortedDestination + '/' + new_name)
+        return 1
+    else:
+        return 0
 
 
 def copy_py3_files_from_dir(directory):
@@ -72,19 +77,11 @@ def copy_py3_files_from_dir(directory):
         for file in files:
             file_name = os.path.join(root, file)
             if os.path.isfile(file_name):
-                files_count += 1
-                copy_one_file(file, file_name, temp_folder + '/')
+                files_count += copy_one_file(file, file_name, temp_folder + '/')
     return files_count
 
 
 def unpack_and_select_files(out_siva):
-    """Downloading siva files (500 at a time).
-       Unpacking siva file, checkout git branch and selecting all python 3 files.
-       Copying all Python 3 files to the targer directory and counting saved files.
-
-       out_siva -- names of siva files, that contain Githib repos written in Python fon the PGA dataset.
-    """
-
     py3_files_total = 0
     repos_num = 0
     for file in tqdm(out_siva):
@@ -98,8 +95,6 @@ def unpack_and_select_files(out_siva):
         # deleting the directory with siva files we have already used
         shutil.rmtree("siva")
 
-        py3_files_total = len(
-            [f for f in os.listdir(temp_folder) if os.path.isfile(os.path.join(temp_folder, f))])
         py3_files_total += new_files_count
         os.remove(file)
     return py3_files_total, repos_num
@@ -120,9 +115,9 @@ def pga(slice, email, target_directory):
 
     temp_siva = content[:slice]
 
-    writeLinesFile(list_siva_temp, temp_siva)
+    writeLinesFile(list_siva_temp, temp_siva, appendWithNewLine=True)
 
-    os.system(f"cat {list_siva_temp} | pga get -i -o repos")
+    os.system(f"cat {dataDir + list_siva_temp} | pga get -i -o repos")
     files_total, repos_total = unpack_and_select_files(select_all_siva_files('repos'))
 
     if os.path.exists("repos"):
