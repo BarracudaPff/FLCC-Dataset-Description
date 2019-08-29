@@ -45,5 +45,6 @@ venv/
 repos/
 list_repos.txt
 list_siva.txt
-
+siva
+temp
 perf.prof
