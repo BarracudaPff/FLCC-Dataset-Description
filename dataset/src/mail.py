@@ -10,7 +10,7 @@ sender_email = ""
 
 class MailNotifier:
 
-    def __init__(self, subject, receiver_email='mrm.kikll@gmail.com'):
+    def __init__(self, subject, receiver_email):
         self.subject = subject
         self.receiver_email = receiver_email
         self.password = password
