@@ -1,13 +1,13 @@
 #!/bin/bash
 
-# Pass 1 parameters. First one for the number of loops
+## Pass 1 parameters. First one for the number of loops
 
 # Next parameters may be as input and customizable ($2,$3,...)
 # Script to run
-file=../src/get_dataset.py
+file=src/get_dataset.py
 
 # Folder to save dataset (Auto mkdir)
-target=../dataset/v2/source-py3
+target=dataset/v2
 
 # Folder, where borges saves siva. (Default is /tmp/root-repositories/)
 sivas=/tmp/root-repositories/
@@ -16,13 +16,13 @@ sivas=/tmp/root-repositories/
 slice=500
 
 # Email to notify, type "none" to disable
-mail=mrm.kikll@gmail.com
+mail=none
 
 # Use this one for downloading from Borges
 # Looping script cause more effective progress and way faster
 for (( i=1; i < ${1}; ++i ))
 do
-    python3 ${file} \
+    PYTHONPATH=. python3 -m cProfile -o perf.prof ${file} \
     --target_directory ${target} \
     --sivas_folder ${sivas} \
     --email_notify none \
@@ -30,7 +30,7 @@ do
 done
 
 if ((${1} > 0))
-then python3 ${file} \
+then PYTHONPATH=. python3 -m cProfile -o perf.prof ${file} \
   --target_directory ${target} \
   --sivas_folder ${sivas} \
   --email_notify ${mail} \
