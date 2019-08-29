@@ -28,7 +28,7 @@ def _getAllLanguages() -> ([], dict):
     content = downloadWithUrl(
         'https://raw.githubusercontent.com/github/linguist/master/lib/linguist/languages.yml',
         'languages.yml',
-        True)
+        False)
     try:
         data = yaml.safe_load(content)
         languages = [language for language in data]
