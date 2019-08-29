@@ -1,8 +1,9 @@
 import os
 import shutil
+import unittest
 from unittest import TestCase
 
-from files import dataDir
+from src.files import dataDir
 
 # Add files here so that they are not deleted during tests
 _saveFiles = [
@@ -25,3 +26,12 @@ def cleanData():
             os.unlink(path)
         elif os.path.isdir(path):
             shutil.rmtree(path)
+
+
+if __name__ == '__main__':
+    loader = unittest.TestLoader()
+    start_dir = 'tests'
+    suite = loader.discover(start_dir)
+
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
