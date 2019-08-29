@@ -2,7 +2,7 @@ import os
 from urllib import request
 from urllib.error import URLError
 
-from files import writeFile, readFile
+from src.files import writeFile, readFile
 
 
 def downloadWithUrl(url: str, filename: str, forceDownload: bool = False, progress: bool = None):

@@ -2,7 +2,7 @@ import argparse
 
 import psycopg2
 
-from mail import MailNotifier
+from src.mail import MailNotifier
 
 subject = '''\
 Subject: Dataset info From AWS Machine. Repositories with errors

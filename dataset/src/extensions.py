@@ -1,7 +1,7 @@
 import yaml
 
-from files import writeJsonFile, readLinesFile
-from web import downloadWithUrl
+from src.files import writeJsonFile, readLinesFile
+from src.web import downloadWithUrl
 
 
 def initExtensions(languages: [] = None):

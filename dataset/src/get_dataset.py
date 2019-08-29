@@ -9,9 +9,9 @@ from distutils.dir_util import copy_tree
 import glob2
 from tqdm import tqdm
 
-from extensions import initExtensions
-from files import readLinesFile, writeLinesFile
-from mail import MailNotifier
+from src.extensions import initExtensions
+from src.files import readLinesFile, writeLinesFile
+from src.mail import MailNotifier
 
 subject = '''\
 Subject: Dataset info From AWS Machine. Info about downloading dataset

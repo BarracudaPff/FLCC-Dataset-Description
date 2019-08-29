@@ -1,4 +1,4 @@
-from files import *
+from src.files import *
 from utils import BaseDataClass
 
 

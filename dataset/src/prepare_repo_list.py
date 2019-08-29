@@ -1,6 +1,6 @@
 import argparse
 
-from mail import MailNotifier
+from src.mail import MailNotifier
 
 subject = '''\
 Subject: Dataset info From AWS Machine. New repo list

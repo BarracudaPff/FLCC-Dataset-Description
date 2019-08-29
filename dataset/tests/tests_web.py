@@ -3,7 +3,7 @@ import os
 from parameterized import parameterized
 
 from utils import cleanData, BaseDataClass
-from web import downloadWithUrl
+from src.web import downloadWithUrl
 
 
 class TestWeb(BaseDataClass):
