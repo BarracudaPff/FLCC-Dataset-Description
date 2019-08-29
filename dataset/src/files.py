@@ -25,7 +25,6 @@ def writeLinesFile(filename: str, data, appendWithNewLine: bool = False):
         dataWithNewLine = data.copy()
         dataWithNewLine.append('\n')
 
-    print(dataWithNewLine)
     with open(_unite(filename), 'w') as w:
         w.writelines(dataWithNewLine)
 

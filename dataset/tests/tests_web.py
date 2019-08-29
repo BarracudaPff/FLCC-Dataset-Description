@@ -1,9 +1,7 @@
-import os
-
 from parameterized import parameterized
 
-from utils import cleanData, BaseDataClass
 from src.web import downloadWithUrl
+from utils import cleanData, BaseDataClass
 
 
 class TestWeb(BaseDataClass):
@@ -32,7 +30,6 @@ class TestWeb(BaseDataClass):
             if isError:
                 self.assertIsNone(content)
             else:
-                print(os.listdir('../data'))
                 self.assertEqual(len(content) > 0, not isError)
 
     def tearDown(self) -> None:
