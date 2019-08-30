@@ -4,6 +4,11 @@ import os
 dataDir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../data/')
 
 
+def mkdir(dir):
+    if not os.path.exists(dir):
+        os.makedirs(dir)
+
+
 def writeFile(filename: str, data):
     with open(_unite(filename), 'w') as w:
         w.write(data)

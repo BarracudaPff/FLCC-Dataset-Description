@@ -10,7 +10,7 @@ import glob2
 from tqdm import tqdm
 
 from src.extensions import initExtensions
-from src.files import readLinesFile, writeLinesFile, dataDir
+from src.files import readLinesFile, writeLinesFile, dataDir, mkdir
 from src.mail import MailNotifier
 
 subject = '''\
@@ -130,11 +130,6 @@ def pga(slice, email, target_directory):
     MailNotifier(subject, email).send_notification(
         f"Left sivas: {content[slice:].__len__()}"
         f" Total files: {files_total} and add repos: {repos_total}")
-
-
-def mkdir(dir):
-    if not os.path.exists(dir):
-        os.makedirs(dir)
 
 
 def borges(slice, email, reverse, target_directory, sivas_folder):
