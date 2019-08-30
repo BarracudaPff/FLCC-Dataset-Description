@@ -11,7 +11,7 @@ Subject: Dataset info From AWS Machine. Repositories with errors
 
 parser = argparse.ArgumentParser(description='Dump skipped repositories from borges and PostgreSQL')
 parser.add_argument('--target_directory', type=str, help='Path to file with skipped repositories',
-                    default='../data/skipped.txt')
+                    default='data/skipped.txt')
 parser.add_argument('--email_notify', type=str, help='Gmail to notify. Type none to skip', default='none')
 
 

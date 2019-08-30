@@ -13,12 +13,12 @@ parser.add_argument('--rep_count',      type=int,   help='Number of repositories
 parser.add_argument('--email_notify',   type=str,   help='Gmail to notify. Type none to skip.',
                     default='none')
 parser.add_argument('--temp_repo_list', type=str,   help='Path of file with temporary list of repositories.',
-                    default='../data/repo_list.txt')
+                    default='data/repo_list.txt')
 parser.add_argument('--reverse',        type=bool,  help='Reverse list of repositories',
                     default=True)
 parser.add_argument('--repo_list',      type=str,
                     help='Path of file with full list of repositories. WARNING: list will be reduced.',
-                    default='../data/rep-list-working.txt')
+                    default=' data/rep-list-working.txt')
 
 
 def prepare_repo_list(repo_list: str, temp_repo_list: str, rep_count: int, email_notify: str, reverse: bool):
