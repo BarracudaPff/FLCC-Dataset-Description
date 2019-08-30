@@ -15,10 +15,9 @@ parser.add_argument('--target_directory', type=str, help='Path to file with skip
 parser.add_argument('--email_notify', type=str, help='Gmail to notify. Type none to skip', default='none')
 
 
-def main():
-    args = parser.parse_args()
+def main(email_notify, target_directory):
     try:
-        select_query = "SELECT (endpoints) from repositories where status != 'fetched';"
+        select_query = "SELECT (endpoints) FROM repositories WHERE status != 'fetched';"
 
         connection = psycopg2.connect(user="testing",
                                       password="testing",
@@ -33,9 +32,9 @@ def main():
         for row in records:
             git_repos.append(row[0][0] + '\n')
 
-        MailNotifier(subject, args.email_notify).send_notification(
+        MailNotifier(subject, email_notify).send_notification(
             f"Skipped: {git_repos}\nTotal {git_repos.__len__()} repos")
-        with open(args.target_directory, 'a') as f:
+        with open(target_directory, 'a') as f:
             f.writelines(git_repos)
 
         # closing database connection.
@@ -44,9 +43,10 @@ def main():
             connection.close()
             print("PostgreSQL connection is closed")
     except Exception as e:
-        if args.email_notify != 'none':
-            MailNotifier(subject, args.email_notify).send_error(e)
+        if email_notify != 'none':
+            MailNotifier(subject, email_notify).send_error(e)
 
 
 if __name__ == '__main__':
-    main()
+    args = parser.parse_args()
+    main(args.email_notify, args.target_directory)
