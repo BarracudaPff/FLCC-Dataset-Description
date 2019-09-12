@@ -95,6 +95,6 @@ matrix:
 
       script:
         - pga --help
-        - siva --help
+        - siva version
         - pga-create --help
         - PYTHONPATH=. python3 -m cProfile -o perf.prof tests/main.py
