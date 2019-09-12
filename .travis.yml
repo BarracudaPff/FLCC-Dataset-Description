@@ -81,6 +81,9 @@ matrix:
       python:
         - 3.7.4
 
+      services:
+        - postgresql
+
       before_install:
         cd dataset
 
