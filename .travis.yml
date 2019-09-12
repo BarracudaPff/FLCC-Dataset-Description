@@ -88,4 +88,4 @@ matrix:
         pip install -r requirements.txt
 
       script:
-        PYTHONPATH=. python3 -m cProfile -o perf.prof tests/utils.py
+        PYTHONPATH=. python3 -m cProfile -o perf.prof tests/main.py
