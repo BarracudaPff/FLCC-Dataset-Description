@@ -1,5 +1,8 @@
 # Create Dataset
 
+Module to get dataset of source files from Github.
+Using pga-create and latest gh-torrent
+
 ## Create repository list
 
 1. Download [latest version](https://golang.org/doc/install) of Go
@@ -16,32 +19,29 @@
 5. Download list of repositories and stars with latest url from [here](http://ghtorrent-downloads.ewi.tudelft.nl/mysql/.)
     
     `pga-create discover --url=http://ghtorrent-downloads.ewi.tudelft.nl/mysql/mysql-2019-06-01.tar.gz`
-    
-## Scan list of repositories
-
-1. Insert github keys in `gh-keys.txt`. Better to use more than 10 keys
-
-1. Scan latest data
-    
-    `TODO`
-2. Count language and licences statistic
-
-    `TODO`
-3. Select languages and create file for extensions
-    
-    `TODO`
 
 ## Download 
 
 Python scripts:
 
-- python3 get_dataset.py - create dataset.
-- python3 dump_error_reps.py - dump errored repositories from Borges.
-- python3 prepare_repo_list.py - Prepare list for Borges, taking only __slice__ off all items to save memory.
+For easier use write `./main.sh <arguments>`
 
-Scripts:
+To run scripts use `./scripts/<some-script.sh>`
 
-- cleanUp.sh - Restart Borges, download and archive new part of dataset using Borges and siva files.
-- loop script - Loop Python scripts. Suitable for get_dataset.py (*PGA* and *Borges*).
-- restart.sh - Restart Borges, PSQL, RabbitMQ and their docker images.
+### Python script options
+| Options           | Description                                                   |
+| ----------------- | ------------------------------------------------------------- |
+| `dataset`         | Get dataset for Languages                                     |
+| `statistic`       | Get statistic for downloaded dataset                          |
+| `prepare_list`    | Extract slice of repositories to downloading and compress     |
+| `dump_errors`     | Dump repositories that caused the download error              |
+| `calibrate`       | Calibrate dataset                                             |
 
+### Scripts
+| Script            | Short Description                                                                           |
+| ----------------- | ------------------------------------------------------------------------------------- |
+| `cleanUp.sh`      | Restart Borges, download and archive new part of dataset using Borges and siva files  |
+| `restart.sh`      | Restart Borges, PSQL, RabbitMQ and their docker images                                |
+| `loop.sh`         | script - Loop Python scripts. Suitable for get_dataset.py (*PGA* and *Borges*)        |
+| `coutn-siva.sh`   | Count files in specific folders                                                       |
+| `tar.sh`          | Archive folder with tar gz                                                            |
