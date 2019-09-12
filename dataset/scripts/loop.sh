@@ -13,7 +13,7 @@ target=dataset/v2
 sivas=/tmp/root-repositories/
 
 # The preferred slice for memory and speed is 500
-slice=500
+slice=1000
 
 # Email to notify, type "none" to disable
 mail=none
@@ -32,27 +32,7 @@ done
 if ((${1} > 0))
 then PYTHONPATH=. python3 -m cProfile -o perf.prof ${file} \
   --target_directory ${target} \
-  --sivas_folder ${sivas} \
+  --use_pga false \
   --email_notify ${mail} \
   --slice ${slice}
 fi
-
-
-# Use this one for PGA downloading
-
-# for (( i=1; i < ${1}; ++i ))
-# do
-#     python3 ${file} \
-#     --target_directory ${target} \
-#     --use_pga true \
-#     --email_notify none \
-#     --slice ${slice}
-# done
-#
-# if ((${1} > 0))
-# then python3 ${file} \
-#   --target_directory ${target} \
-#   --use_pga true \
-#   --email_notify ${mail} \
-#   --slice ${slice}
-# fi
