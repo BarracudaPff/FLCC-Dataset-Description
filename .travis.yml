@@ -85,10 +85,16 @@ matrix:
         - postgresql
 
       before_install:
-        cd dataset
+        - cd dataset
+        - go get -u gopkg.in/src-d/go-siva.v1/...
+        - go get github.com/src-d/datasets/PublicGitArchive/pga
+        - go get -v github.com/src-d/datasets/PublicGitArchive/pga-create/...
 
       install:
-        pip install -r requirements.txt
+        - pip install -r requirements.txt
 
       script:
-        PYTHONPATH=. python3 -m cProfile -o perf.prof tests/main.py
+        - pga --help
+        - siva --help
+        - pga-create --help
+        - PYTHONPATH=. python3 -m cProfile -o perf.prof tests/main.py
