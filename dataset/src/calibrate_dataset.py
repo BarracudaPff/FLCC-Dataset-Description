@@ -1,58 +1,55 @@
-import argparse
 import os
 import shutil
+import sys
 import time
 
 from tqdm import tqdm
 
-from files import writeLinesFile
-from src.mail import MailNotifier
-
-subject = '''\
-Subject: Dataset info From AWS Machine. Repositories with errors
-
->'''
-
-parser = argparse.ArgumentParser(description='Dump skipped repositories from borges and PostgreSQL')
-parser.add_argument('--target_directory', type=str, help='Dataset directory root')
-parser.add_argument('--email_notify', type=str, help='Gmail to notify. Type none to skip', default='none')
-
-max_files_in_folder = 100
+from src.config import max_files_in_folder, subject
+from src.utils.files import writeLinesFile
+from src.utils.mail import MailNotifier
 
 
-def handleHugeFolder(path: [], log):
+def handle_huge_folder(path: [], log, position, disableTQDM=False) -> bool:
     root = '/'.join(path[:-1])
-    results = list(map(int, os.listdir(root)))
     old_folder = '/'.join(path)
-    new_folder = max(results) + 1
 
+    new_folder = max(list(map(int, os.listdir(root)))) + 1
     new_folder = os.path.join(root, str(new_folder))
 
-    os.makedirs(new_folder)
-
     files = os.listdir(old_folder)
-    for f in tqdm(files, desc=root):
+
+    if len(files) < max_files_in_folder:
+        position -= 1
+        return False
+
+    left = len(files) - max_files_in_folder
+    left = left if left > 0 else 0
+
+    os.makedirs(new_folder)
+    for f in tqdm(files[:max_files_in_folder], desc=root, position=position, disable=disableTQDM):
+        pass
         shutil.move(os.path.join(old_folder, f), new_folder)
 
-    log.append(f"Moved {len(files)} files {old_folder} -> {new_folder}")
+    log.append(f"Moved {max_files_in_folder} files {old_folder} -> {new_folder}. In folder left {left}")
+    return left > 0
 
 
-def main(email, target_directory):
+def calibrate(email, target_directory):
     notifier = MailNotifier(subject, email)
     log = []
 
-    for root, dirs, files in os.walk(target_directory):
+    position = 0
+    for root, dirs, files in tqdm(os.walk(target_directory), position=0):
         path = root.split('/')
         if path[-1] == '0':
-            num = (len([name for name in os.listdir(root)]))
-            if num > max_files_in_folder:
-                handleHugeFolder(path, log)
+            num = (len(os.listdir(root)))
+            if num >= max_files_in_folder:
+                while handle_huge_folder(path, log, position):
+                    position += 1
 
+    sys.stdout.flush()
     if len(log) > 0:
         writeLinesFile("moving-log-" + str(time.time()) + '.txt', log, appendWithNewLine=True)
+    print('\n' * position)
     notifier.send_notification(log)
-
-
-if __name__ == '__main__':
-    args = parser.parse_args()
-    main(args.email_notify, args.target_directory)
