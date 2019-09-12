@@ -1,38 +1,18 @@
-import argparse
 import os
 import re
 import shutil
 import subprocess
 import time
-from distutils.dir_util import copy_tree
 
-import glob2
 from tqdm import tqdm
 
-from src.extensions import initExtensions
-from src.files import readLinesFile, writeLinesFile, dataDir, mkdir
-from src.mail import MailNotifier
+from config import temp_folder, hide_output, list_siva, list_siva_temp, subject
+from utils.exts import extensions as exts
+from utils.files import readLinesFile, writeLinesFile, dataDir, mkdir, move_all_files_from_temp, \
+    select_all_files_with_extension
+from utils.mail import MailNotifier
 
-subject = '''\
-Subject: Dataset info From AWS Machine. Info about downloading dataset
-
->'''
-
-parser = argparse.ArgumentParser(description='Get dataset for Python 3')
-parser.add_argument('--target_directory', type=str, help='Directory to save Python3 file')
-parser.add_argument('--sivas_folder', type=str, help='Directory where are sivas')
-parser.add_argument('--email_notify', type=str, help='Gmail to notify. Type none to skip', default='none')
-parser.add_argument('--reverse', type=bool, help='Reverse list of repositories', default=False)
-parser.add_argument('--use_pga', type=bool, help='Use PGA', default=False)
-parser.add_argument('--slice', type=int, help='Amount of files from sivas_folder', default=500)
-
-temp_folder = 'temp'
-list_siva = 'siva.txt'
-list_siva_temp = 'list-siva-temp.txt'
-hide_output = ' > /dev/null'
-
-languages = readLinesFile("languages.txt")
-extensions = initExtensions(languages)
+extensions = exts(None)
 
 
 def do_bash_command(bash_command):
@@ -100,17 +80,8 @@ def unpack_and_select_files(out_siva):
     return py3_files_total, repos_num
 
 
-def select_all_siva_files(root):
-    files = glob2.glob(root + '/**/*.siva')
-    return files
-
-
-def move_all_files_from_temp(target: str, temp: str):
-    copy_tree(target, temp)
-    shutil.rmtree(temp_folder)
-
-
 def pga(slice, email, target_directory):
+    # TODO add creation of siva list
     content = readLinesFile(list_siva)
 
     temp_siva = content[:slice]
@@ -118,12 +89,12 @@ def pga(slice, email, target_directory):
     writeLinesFile(list_siva_temp, temp_siva, appendWithNewLine=True)
 
     os.system(f"cat {dataDir + list_siva_temp} | pga get -i -o repos")
-    files_total, repos_total = unpack_and_select_files(select_all_siva_files('repos'))
+    files_total, repos_total = unpack_and_select_files(select_all_files_with_extension('repos', '.siva'))
 
     if os.path.exists("repos"):
         shutil.rmtree("repos")
 
-    move_all_files_from_temp(temp_folder, target_directory)
+    move_all_files_from_temp(target_directory, temp_folder)
 
     writeLinesFile(list_siva, content[slice:])
 
@@ -134,7 +105,7 @@ def pga(slice, email, target_directory):
 
 def borges(slice, email, reverse, target_directory, sivas_folder):
     notifier = MailNotifier(subject, email)
-    out_siva = select_all_siva_files(sivas_folder)
+    out_siva = select_all_files_with_extension(sivas_folder, '.siva')
     total = out_siva.__len__()
 
     if reverse:
@@ -148,23 +119,21 @@ def borges(slice, email, reverse, target_directory, sivas_folder):
 
     files_total, repos_total = unpack_and_select_files(out_siva)
 
-    move_all_files_from_temp(temp_folder, target_directory)
+    move_all_files_from_temp(target_directory, temp_folder)
 
     notifier.send_notification(
         f"Finnished. Total files:{files_total} and add repos: {repos_total}")
 
 
-if __name__ == '__main__':
-    args = parser.parse_args()
+def dataset(target_directory, email_notify, sivas_folder, mode, reverse):
     mkdir(temp_folder)
-    mkdir(args.target_directory)
+    mkdir(target_directory)
+
     for key in extensions:
         mkdir(os.path.join(temp_folder, extensions[key]))
-    try:
-        if args.use_pga:
-            pga(args.slice, args.email_notify, args.target_directory)
-        else:
-            borges(args.slice, args.email_notify, args.reverse, args.target_directory, args.sivas_folder)
-    except Exception as error:
-        MailNotifier(subject, args.email_notify).send_error(str(error))
-        raise error
+    if mode == 'pga':
+        pga(slice, email_notify, target_directory)
+    elif mode == 'borges':
+        borges(slice, email_notify, reverse, target_directory, sivas_folder)
+    else:
+        raise Exception
