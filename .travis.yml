@@ -5,7 +5,7 @@ branches:
 matrix:
   include:
 
-    - name: JupyterLab plugin check
+    - name: JupyterLab Plugin
 
       language:
         python
@@ -36,7 +36,7 @@ matrix:
           - $HOME/.npm
 
 
-    - name: PyCharm Plugin check
+    - name: PyCharm Plugin
 
       language:
         java
@@ -64,7 +64,7 @@ matrix:
         - ./gradlew clean buildPlugin
 
 
-    - name: Flask Server check
+    - name: Completion Server
 
       language:
         python
