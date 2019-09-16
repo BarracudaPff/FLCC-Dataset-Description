@@ -1,11 +1,18 @@
+branches:
+  only:
+    - master
+
 matrix:
   include:
 
-    # JupyterLab plugin check
-    - language:
+    - name: JupyterLab Plugin
+
+      language:
         python
+
       python:
         - "3.6"
+
       sudo: false
       dist: trusty
 
@@ -28,18 +35,20 @@ matrix:
         directories:
           - $HOME/.npm
 
-    # PyCharm Plugin check
-    - language:
+
+    - name: PyCharm Plugin
+
+      language:
         java
 
       install:
         true
 
-      before_install:
-        cd ide-plugin
-
       jdk:
         - openjdk8
+
+      before_install:
+        cd ide-plugin
 
       before_cache:
         - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
@@ -54,8 +63,10 @@ matrix:
         - ./gradlew clean test
         - ./gradlew clean buildPlugin
 
-    # Flask Server check
-    - language:
+
+    - name: Completion Server
+
+      language:
         python
 
       python:
