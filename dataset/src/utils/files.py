@@ -26,8 +26,9 @@ def move_all_files_from_temp(target: str, temp: str):
                 shutil.move(file_name, move)
     print('\n' * 2)
     try:
-        shutil.rmtree(temp_folder)
-    except FileNotFoundError as e:
+        root_dir = temp_folder.split('/')[0]
+        shutil.rmtree(root_dir)
+    except FileNotFoundError:
         pass
 
 
@@ -81,8 +82,11 @@ def readLinesFile(filename: str):
     return data
 
 
-def writeJsonFile(filename: str, data: json):
-    new_file = _unite(filename)
+def writeJsonFile(filename: str, data: json, dataFolder=True):
+    if dataFolder:
+        new_file = _unite(filename)
+    else:
+        new_file = filename
     mkdir(os.path.dirname(new_file))
 
     with open(new_file, 'w') as w:
