@@ -19,7 +19,7 @@ def extensions(languages_file):
             if languageExtensions is None:
                 continue
             for extension in languageExtensions:
-                _extensions[extension] = f"{language}/{extension}/0"
+                _extensions[extension] = f"{language}/{extension}"
         except AttributeError:
             raise TypeError(f"Wrong language name: {language}")
 
