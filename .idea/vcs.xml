@@ -6,5 +6,6 @@
     <mapping directory="$PROJECT_DIR$/dataset/data/data2" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/dataset/data/siva" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/dataset/scripts/siva" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/dataset/siva" vcs="Git" />
   </component>
 </project>
