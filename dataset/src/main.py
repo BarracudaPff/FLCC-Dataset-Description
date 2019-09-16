@@ -1,12 +1,11 @@
 import argparse
 import os
 
-import get_dataset
 import main
 from calibrate_dataset import calibrate
-from config import subject
+from config import subject, dataDir
 from dump_error_reps import dump_errors
-from get_dataset import dataset
+from get_dataset import Dataset
 from prepare_repo_list import prepare_list
 from statistic import statistic
 from utils.exts import extensions
@@ -37,8 +36,6 @@ dataset_parser.add_argument('--sivas_folder', type=str, default='/tmp/root-repos
                             help='Directory where are sivas')
 dataset_parser.add_argument('--slice', type=int, default=500,
                             help='Amount of files from sivas_folder')
-dataset_parser.add_argument('--reverse', type=bool, default=False,
-                            help='Reverse processing siva files')
 dataset_parser.add_argument('--languages_file', type=str, default='languages.txt',
                             help='Path to file with list of languages')
 dataset_parser.add_argument('-mode', type=str, action="store", choices=['pga', 'borges'], required=True,
@@ -67,16 +64,21 @@ calibrate_parser = subparsers.add_parser('calibrate', help='Calibrate dataset')
 
 
 def _dataset(args: argparse.Namespace):
-    print(args)
     languages_file = args.languages_file
 
-    if os.path.exists(languages_file):
-        get_dataset.extensions = extensions(args.languages_file)
+    if os.path.exists(dataDir + languages_file):
+        exts = extensions(args.languages_file)
     else:
         print(f"File {languages_file} with language list wasn't found. Downloading all possible languages")
-        get_dataset.extensions = extensions(None)
+        exts = extensions(None)
 
-    dataset(args.target_directory, args.email_notify, args.sivas_folder, args.mode, args.reverse)
+    dataset = Dataset(exts, args.slice, args.target_directory, args.email_notify)
+    if args.mode == 'pga':
+        dataset.pga()
+    elif args.mode == 'borges':
+        dataset.borges(args.sivas_folder)
+    else:
+        raise Exception
 
 
 def _statistic(args: argparse.Namespace):
