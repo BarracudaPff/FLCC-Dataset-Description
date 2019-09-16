@@ -24,7 +24,7 @@ parser = argparse.ArgumentParser(formatter_class=SubParsersFormatter, descriptio
 
 base_parser = argparse.ArgumentParser(description="The parent parser", add_help=False)
 base_parser.add_argument('--target_directory', type=str, help='Dataset directory root',
-                         default='dataset/v2')
+                         default='dataset')
 base_parser.add_argument('--email_notify', type=str, help='Gmail to notify. Type none to skip',
                          default='none')
 
@@ -50,8 +50,6 @@ list_parser = subparsers.add_parser('prepare_list', help='Extract slice of repos
                                     parents=[base_parser])
 list_parser.add_argument('--rep_count', type=int, default=5000,
                          help='Number of repositories to get from the general list.')
-list_parser.add_argument('--reverse', type=bool, default=True,
-                         help='Reverse list of repositories')
 list_parser.add_argument('--repo_list', type=str, default='data/rep-list-working.txt',
                          help='Path to file with full list of repositories. WARNING: list will be reduced.')
 

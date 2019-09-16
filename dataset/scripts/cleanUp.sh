@@ -6,10 +6,10 @@ timeout=10m
 root=/tmp/root-repositories
 
 # Dump errored repos
-PYTHONPATH=. python3 -m cProfile -o perf.prof src/dump_error_reps.py
+source main.sh dump_errors
 
 # Prepare list of repositories
-PYTHONPATH=. python3 -m cProfile -o perf.prof src/prepare_repo_list.py
+source main.sh prepare_list
 
 # Restart databases (cause of errors)
 source scripts/restart.sh
