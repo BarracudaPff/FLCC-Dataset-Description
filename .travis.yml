@@ -85,8 +85,10 @@ matrix:
       script:
         PYTHONPATH=. python3 -m cProfile -o perf.prof tests/base.py
 
-    # Dataset check
-    - language:
+
+    - name: Dataset
+
+      language:
         python
 
       python:
