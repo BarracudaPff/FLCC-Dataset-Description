@@ -6,7 +6,7 @@ from src.utils.mail import MailNotifier
 def prepare_list(repo_list: str, rep_count: int, email_notify: str):
     content = readLinesFile(repo_list)
 
-    writeLinesFile(temp_repo_list, content[:rep_count])
+    writeLinesFile(temp_repo_list, content[:rep_count], appendWithNewLine=True)
 
     MailNotifier(subject, email_notify).send_notification(
         f"Was repos: {content.__len__()}. "
