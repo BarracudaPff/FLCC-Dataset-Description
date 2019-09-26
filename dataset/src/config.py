@@ -9,7 +9,8 @@ temp_folder = 'temp'
 siva_folder = 'siva'
 list_siva = 'siva.txt'
 list_siva_temp = 'list-siva-temp.txt'
-temp_repo_list = 'data/temp-repo-list.txt'
+temp_repo_list = 'repo-list.txt'
+skipped = 'skipped.txt'
 
 # TODO: add password and email here for email logging
 password = "None"
