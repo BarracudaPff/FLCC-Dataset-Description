@@ -1,11 +1,11 @@
 # Description of dataset
 
-Dataset of source for Full l
+A dataset of source files from GitHub for Code Completion
 
 ## Table of content
 - [Structure](#structure)
     - [Languages](#languages)
-        - [Extensions](#extensions)
+    - [Extensions](#extensions)
     - [Repositories](#repositories)
         - [files.json](#filesjson)
         - [paths.json](#pathsjson)
@@ -45,31 +45,32 @@ dataset/v3
 Dataset split for 2 data-parts, languages and repositories.
 **All extensions includes dot.**
 
-Naming rule for all source files - <New_name> = <Old_name>_<Unix_time><.Extension><sup>*</sup>  
+Naming rule for all source files: 
+`<New_name> = <Old_name>_<Unix_time><.Extension><sup>*</sup>`  
 `btree_test_1569435301125374618.go`
 
 
+&nbsp;
+## Languages
 
-### Languages
-
-All languages first grouped by **Language**, then by **Extension**.
+All languages first grouped by **Language**, then by **Extension**.              
 `./languages/HTML/.html/...`
 
 Then every folder sorted by **Author**, **Repository** and **Init Hash**. Here, **Init Hash** means hash for first commit in branch, if repository has multiple branches with unrelated histories.  
 `.../google/gvisor/deb7ecf1e46862d54f4b102f2d163cfbcfc37f3b/...`
 
-Dataset includes 103 most popular languages in [Github](https://github.com) with all possible extensions. Full list of them contains in [languages.txt](languages.txt)
+Dataset includes 103 most popular languages in Github with all possible extensions. Full list of them contains in [languages.txt](languages.txt)
 
-
-#### Extensions
+&nbsp;
+### Extensions
 
 Languages downloaded with all possible extensions. Full list in JSON format contains in [extensions.json](extensions.json)
 
 > Generated using [languages.yml](https://github.com/github/linguist/blob/master/lib/linguist/languages.yml) from [github/linguist](https://github.com/github/linguist)
 
 
-
-### Repositories
+&nbsp;
+## Repositories
 
 All repositories are sorted just as languages by **Author**, **Repository** and **Init Hash**.  
 `.../google/gvisor/deb7ecf1e46862d54f4b102f2d163cfbcfc37f3b/...`
@@ -94,7 +95,7 @@ To control the number of files in the repository and determine the primary langu
 }
 ```
 
-
+&nbsp;
 #### paths.json
 
 To find out real path of file and it's filename we have `paths.json`, where there is real path for every saved file.  
@@ -113,7 +114,7 @@ To find out real path of file and it's filename we have `paths.json`, where ther
 }
 ```
 
-
+&nbsp;
 #### METADATA
 
 To find out history for every file in repository, we have `METADATA`, where stored all files'commit history in plaintext. 
@@ -140,7 +141,7 @@ M       btree_test.go
 
 
 
-
+&nbsp;
 ## Download
 Full dataset slitted by parts
 
@@ -152,7 +153,7 @@ Full dataset slitted by parts
 | 2 | [link](https://5k-dataset.s3.amazonaws.com/v3/dataset-open-50-more-2.tar.gz) | 56.8 GB | ? | ? |
 
 
-
+&nbsp;
 ## Extra
 ### Statistic
 ### Scripts
