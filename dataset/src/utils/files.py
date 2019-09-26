@@ -17,14 +17,13 @@ def select_all_files_with_extension(root, extension):
 
 def move_all_files_from_temp(target: str, temp: str):
     for root, dirs, files in tqdm(os.walk(temp), position=0):
-        for file in tqdm(files, position=1, desc=root):
+        for file in files:
             file_name = os.path.join(root, file)
             if os.path.isfile(file_name):
                 move = os.path.join(target, file_name[len(temp) + 1:])
                 directories = os.path.dirname(move)
                 mkdir(directories)
-                shutil.move(file_name, move)
-    print('\n' * 2)
+                shutil.copy(file_name, move)
     try:
         root_dir = temp_folder.split('/')[0]
         shutil.rmtree(root_dir)
