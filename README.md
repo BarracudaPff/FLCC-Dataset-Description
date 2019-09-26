@@ -47,7 +47,7 @@ Dataset split for 2 data-parts, languages and repositories.
 
 Naming rule for all source files:
 
-`<New_name> = <Old_name>_<Unix_time><.Extension><sup>*</sup>`  
+`<New_name> = <Old_name>_<Unix_time><.Extension>`  
 `btree_test.go -> btree_test_1569435301125374618.go`
 
 
