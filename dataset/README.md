@@ -21,7 +21,7 @@ To understand dataset's structure, follow the link to [BarracudaPff/FLCC-Dataset
     `go get github.com/src-d/datasets/PublicGitArchive/pga`
 3. Install [Borges](https://github.com/src-d/borges/releases)
 
-    **After install place it somewhere and configure path in `scripts/loop.sh`** 
+    **After install place it somewhere and configure path to borges in `scripts/loop.sh`** 
    
 4. Install [PGA-create](https://github.com/src-d/datasets/blob/master/PublicGitArchive/pga-create/README.md)
 
