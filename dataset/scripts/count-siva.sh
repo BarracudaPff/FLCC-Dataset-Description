@@ -2,9 +2,7 @@
 
 echo "/tmp/root-repositories/"
 ls /tmp/root-repositories/ | wc -l
-echo "/tmp/root-repositories-1/"
-ls /tmp/root-repositories-1/ | wc -l
-echo "/tmp/root-repositories-2/"
-ls /tmp/root-repositories-2/ | wc -l
-echo "/tmp/root-repositories-3/"
-ls /tmp/root-repositories-3/ | wc -l
+echo "/tmp/skipped-repos/"
+ls /tmp/skipped-repos/ | wc -l
+echo "/tmp/timeout-repositories/"
+ls /tmp/timeout-repositories/ | wc -l

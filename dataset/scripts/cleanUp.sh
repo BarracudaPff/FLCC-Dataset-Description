@@ -24,7 +24,7 @@ rm -r /tmp/borges/
 sleep 5
 
 # Init repositories to download and compress
-../../../../borges/borges producer file data/repo_list.txt
+../../../../borges/borges producer file data/repo-list.txt
 
 # Start jobs.
 ../../../../borges/borges consumer --workers=${workers} --timeout=${timeout} --root-repositories-dir=${root}

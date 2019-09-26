@@ -1,10 +1,7 @@
 #!/bin/bash
 
 ## Pass 1 parameters. First one for the number of loops
-
 # Next parameters may be as input and customizable ($2,$3,...)
-# Script to run
-file=src/get_dataset.py
 
 # Folder to save dataset (Auto mkdir)
 target=dataset/v3
@@ -23,7 +20,7 @@ mail=none
 languages=languages.txt
 
 # Choose how you downloading sivas. With PGA or Borges
-mode=pga
+mode=borges
 
 # Use this one for downloading from Borges
 # Looping script cause more effective progress and way faster
