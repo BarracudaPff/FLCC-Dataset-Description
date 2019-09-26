@@ -45,8 +45,9 @@ dataset/v3
 Dataset split for 2 data-parts, languages and repositories.
 **All extensions includes dot.**
 
-Naming rule for all source files: 
-&nbsp;`<New_name> = <Old_name>_<Unix_time><.Extension><sup>*</sup>`  
+Naming rule for all source files:
+
+`<New_name> = <Old_name>_<Unix_time><.Extension><sup>*</sup>`  
 `btree_test.go -> btree_test_1569435301125374618.go`
 
 
@@ -155,6 +156,8 @@ Full dataset slitted by parts
 
 &nbsp;
 ## Extra
-### Statistic
-### Scripts
 ### Spikes
+1. For some projects it's impossible to find out name of repository and author. In such case, author name is **dev**, repository name is **null** and init hash is **random uuid**.
+So all lost projects placed in `dev/null/<uuid>`
+
+2. Some files caused Exception "too long filename" and were renamed without filename to `<Unix_time><Extension>`. It's still possible to find real name out in paths.json
