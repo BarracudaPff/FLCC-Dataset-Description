@@ -56,6 +56,8 @@ list_parser.add_argument('--repo_list', type=str, default='data/rep-list-working
 # A dump errors command
 errors_parser = subparsers.add_parser('dump_errors', help='Dump repositories that caused the download error',
                                       parents=[base_parser])
+errors_parser.add_argument('--skipped_file', type=str, default='skipped.txt',
+                           help='File with list of skipped repositories.')
 
 # A calibrate command
 calibrate_parser = subparsers.add_parser('calibrate', help='Calibrate dataset')
@@ -88,7 +90,7 @@ def _prepare_list(args: argparse.Namespace):
 
 
 def _dump_errors(args: argparse.Namespace):
-    dump_errors(args.email_notify, args.target_directory)
+    dump_errors(args.email_notify, args.skipped_file)
 
 
 def _calibrate(args: argparse.Namespace):
