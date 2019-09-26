@@ -2,23 +2,35 @@
 
 Module to get dataset of source files from Github.
 Using pga-create and latest gh-torrent
+**RUN WITH PYTHON 3.7.4**
+
+## Dataset structure
+
+To understand dataset's structure, follow the link to [BarracudaPff/FLCC-Dataset-Description](https://github.com/BarracudaPff/FLCC-Dataset-Description).
+
 
 ## Create repository list
 
 1. Download [latest version](https://golang.org/doc/install) of Go
 
-2. Install [siva](https://github.com/src-d/go-siva)
+2. Install [Siva](https://github.com/src-d/go-siva)
 
     `go get -u gopkg.in/src-d/go-siva.v1/...`
-3. Install [pga](https://github.com/src-d/datasets/tree/master/PublicGitArchive/pga)
+3. Install [PGA](https://github.com/src-d/datasets/tree/master/PublicGitArchive/pga)
 
     `go get github.com/src-d/datasets/PublicGitArchive/pga`
-4. Install [pga-create](https://github.com/src-d/datasets/blob/master/PublicGitArchive/pga-create/README.md)
+3. Install [Borges](https://github.com/src-d/borges/releases)
+
+    **After install place it somewhere and configure path in `scripts/loop.sh`** 
+   
+4. Install [PGA-create](https://github.com/src-d/datasets/blob/master/PublicGitArchive/pga-create/README.md)
 
     `go get -v github.com/src-d/datasets/PublicGitArchive/pga-create`    
 5. Download list of repositories and stars with latest url from [here](http://ghtorrent-downloads.ewi.tudelft.nl/mysql/.)
     
     `pga-create discover --url=http://ghtorrent-downloads.ewi.tudelft.nl/mysql/mysql-2019-06-01.tar.gz`
+
+**Create your list of languages with every language at every new line like [here](https://github.com/BarracudaPff/FLCC-Dataset-Description/blob/master/languages.txt)**
 
 ## Download 
 
