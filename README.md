@@ -150,8 +150,8 @@ Full dataset slitted by parts
 
 | Part |Link | Compressed size | Full size | Amount of files | Amount of repositories |
 | ---- |---- | --------------- | --------- | --------------- | ---------------------- |
-| 1 | will be approximately in 2.30 AM (CET)                                          | ?          | 511 GB | 32665248  |157367 |
-| 2 | [link](https://5k-dataset.s3.amazonaws.com/v3/dataset-open-50-more-2.tar.gz) | 56.8 GB    |~500 GB | ?         | ?     |
+| 1 | [link](https://5k-dataset.s3.amazonaws.com/v3/dataset-open-50-more-1.tar.gz) | 86G     |  511 GB | 32665248  | 157367 |
+| 2 | [link](https://5k-dataset.s3.amazonaws.com/v3/dataset-open-50-more-2.tar.gz) | 56.8 GB | ~500 GB | ?         | ?     |
 
 
 &nbsp;
