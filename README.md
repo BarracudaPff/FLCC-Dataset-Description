@@ -13,7 +13,6 @@ A dataset of source files from GitHub for Code Completion
 - [Download](#download)
 - [Extra](#extra)
     - [Statistic](#statistic)
-    - [Scripts](#scripts)
     - [Spikes](#spikes)
 
 
@@ -151,11 +150,20 @@ Full dataset slitted by parts
 | Part |Link | Compressed size | Full size | Amount of files | Amount of repositories |
 | ---- |---- | --------------- | --------- | --------------- | ---------------------- |
 | 1 | [link](https://5k-dataset.s3.amazonaws.com/v3/dataset-open-50-more-1.tar.gz) | 86G     |  511 GB | 32665248  | 157367 |
-| 2 | [link](https://5k-dataset.s3.amazonaws.com/v3/dataset-open-50-more-2.tar.gz) | 56.8 GB | ~500 GB | ?         | ?     |
+| 2 | [link](https://5k-dataset.s3.amazonaws.com/v3/dataset-open-50-more-2.tar.gz) | 56.8 GB |  329 GB | 18994478  | ?     |
 
 
 &nbsp;
 ## Extra
+
+&nbsp;
+### Statistic
+Full statistic about amount of files per language or extension placed in [statistic](statistics) folder. Slitted by parts or united for repositories with 50 or more stars 
+
+#### First 60 languages and languages with extensions
+![First 60 languages](/docs/images/f_l.png) ![First 60 languages and extensions](/docs/images/f_l_e.png)
+
+&nbsp;
 ### Spikes
 1. For some projects it's impossible to find out name of repository and author. In such case, author name is **dev**, repository name is **null** and init hash is **random uuid**.
 So all lost projects placed in `dev/null/<uuid>`
