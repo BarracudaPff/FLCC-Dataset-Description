@@ -17,7 +17,7 @@
                                 id="FullLineCompletionContributor"
                                 order="last"
                                 implementationClass="org.jetbrains.completion.full.line.FullLineContributor"/>
-        <registryKey key="full.line.completion.server.url" defaultValue="54.92.216.222"
+        <registryKey key="full.line.completion.server.url" defaultValue="34.210.4.157"
                      description="Full line completion server address"/>
 
         <registryKey key="full.line.completion.server.port" defaultValue="5001"
