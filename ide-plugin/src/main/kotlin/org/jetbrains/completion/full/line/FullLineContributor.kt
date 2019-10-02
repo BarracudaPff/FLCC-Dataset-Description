@@ -6,7 +6,6 @@ import com.intellij.codeInsight.completion.CompletionResultSet
 import com.intellij.codeInsight.completion.PrioritizedLookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.openapi.diagnostic.Logger
-import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.util.registry.Registry
 import icons.PythonIcons
 
@@ -26,8 +25,8 @@ class FullLineContributor : CompletionContributor() {
     }
 
     private val providers: List<FullLineCompletionProvider> = listOf(
-        NetworkCompletionProvider("gpt", "${completionServerUrl()}/v1/complete/gpt"),
-        NetworkCompletionProvider("char-rnn", "${completionServerUrl()}/v1/complete/charrnn")
+            NetworkCompletionProvider("gpt", "${completionServerUrl()}/v1/complete/gpt")
+            //NetworkCompletionProvider("char-rnn", "${completionServerUrl()}/v1/complete/charrnn")
     )
 
     override fun fillCompletionVariants(parameters: CompletionParameters, result: CompletionResultSet) {
@@ -40,10 +39,10 @@ class FullLineContributor : CompletionContributor() {
         for (provider in providers) {
             for (variant in provider.getVariants(context, filename)) {
                 val lookupElementBuilder = LookupElementBuilder.create(variant)
-                    .withTailText("  ${provider.description}", true)
-                    .withTypeText(FULL_LINE_TAIL_TEXT)
-                    .withIcon(PythonIcons.Python.Python)
-                    .withInsertHandler(INSERT_HANDLER)
+                        .withTailText("  ${provider.description}", true)
+                        .withTypeText(FULL_LINE_TAIL_TEXT)
+                        .withIcon(PythonIcons.Python.Python)
+                        .withInsertHandler(INSERT_HANDLER)
                 result.addElement(PrioritizedLookupElement.withPriority(lookupElementBuilder, 200000.0))
             }
         }
