@@ -152,6 +152,13 @@ Full dataset slitted by parts
 | 1 | [link](https://5k-dataset.s3.amazonaws.com/v3/dataset-open-50-more-1.tar.gz) | 86G     |  511 GB | 32665248  | 157367 |
 | 2 | [link](https://5k-dataset.s3.amazonaws.com/v3/dataset-open-50-more-2.tar.gz) | 56.8 GB |  329 GB | 18994478  | ?     |
 
+**Repositories from 10 to 50 stars**
+
+| Part |Link | Compressed size | Full size | Amount of files | Amount of repositories |
+| ---- |---- | --------------- | --------- | --------------- | ---------------------- |
+| 1 | [link](https://5k-dataset.s3.amazonaws.com/v3/dataset-open-50-less-1.tar.gz) | 101.6 GB|  >500 GB | ?  | ? |
+| 2 | [link](https://5k-dataset.s3.amazonaws.com/v3/dataset-open-50-less-2.tar.gz) | 111.9 GB |  >500 GB | ?  | ? |
+
 
 &nbsp;
 ## Extra
