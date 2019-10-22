@@ -1,47 +1,30 @@
 import os
 import shutil
-import subprocess
 import time
-import sys
 
 from tqdm import tqdm
 
 from src.config import temp_folder, subject, siva_folder
-from src.utils.db import Connector
 from src.utils.files import mkdir, move_all_files_from_temp, \
     select_all_files_with_extension, writeJsonFile
 from src.utils.mail import MailNotifier
+from utils.cmd import repository_by_branch, checkout_branch, head_branches, unpack_siva, write_repository_history
 
-
-def do_bash_command(bash_command):
-    process = subprocess.Popen([bash_command], shell=True, stdout=subprocess.PIPE)
-    output, _ = process.communicate()
-    return output
-
-
-def checkout_branch():
-    branches = do_bash_command(f"git --git-dir={siva_folder}/.git branch")
-    if branches:
-        branches_list = branches.decode("utf-8").split("\n")
-        checkout = branches_list[0]
-        for branch in branches_list:
-            if branch.lstrip().startswith('HEAD'):
-                checkout = branch
-        subprocess.call(
-            (f"git --git-dir={siva_folder}/.git --work-tree={siva_folder}/ checkout " + checkout).split(),
-            stdout=open(os.devnull, 'w'), stderr=subprocess.STDOUT)
-        return True
-    else:
-        return False
+modes = ['files', 'paths', 'histories']
 
 
 class Dataset:
 
-    def __init__(self, extensions, slice, target_directory, email_notify):
+    def __init__(self, extensions, slice, target_directory, email_notify, arg_modes, only_master):
         self.extensions = extensions
         self.notifier = MailNotifier(subject, email_notify)
         self.target_directory = target_directory
         self.slice = slice
+        self.only_master = only_master
+
+        for mode in arg_modes:
+            exec(f"self.{mode} = {(mode in arg_modes)}")
+
         mkdir(temp_folder + '/languages')
         mkdir(temp_folder + '/repositories')
         mkdir(target_directory)
@@ -110,9 +93,10 @@ class Dataset:
                 new_name = os.path.join(destination, sortedDestination, repository, new_name)
                 shutil.copy(file_name, new_name)
 
-            files_paths[new_name.split('/')[-1]] = file_name.split('/', 1)[1]
+            if self.paths:
+                files_paths[new_name.split('/')[-1]] = file_name.split('/', 1)[1]
 
-            if sortedDestination in files_data:
+            if self.files and sortedDestination in files_data:
                 files_data[sortedDestination] += 1
             else:
                 files_data[sortedDestination] = 1
@@ -120,7 +104,7 @@ class Dataset:
         else:
             return 0
 
-    def copy_py3_files_from_dir(self, directory, repository):
+    def copy_files_from_dir(self, directory, repository):
         """Checking on which Python version the file is written.
            If Python 3 than copy the file to the target directory.
         """
@@ -134,37 +118,39 @@ class Dataset:
                     files_count += self.copy_file(file, file_name, temp_folder + '/languages', repository,
                                                   files_data, files_paths)
 
-        writeJsonFile(f"{temp_folder}/repositories/{repository}/paths.json", files_paths, dataFolder=False)
-        writeJsonFile(f"{temp_folder}/repositories/{repository}/files.json", files_data, dataFolder=False)
-        do_bash_command(f"git --git-dir={siva_folder}/.git config diff.renameLimit 999999")
-        do_bash_command(f"git --git-dir={siva_folder}/.git log --pretty=%ct --name-status --diff-filter=ACDMR "
-                        f"> {temp_folder}/repositories/{repository}/METADATA")
+        if self.paths:
+            writeJsonFile(f"{temp_folder}/repositories/{repository}/paths.json", files_paths, dataFolder=False)
+        if self.files:
+            writeJsonFile(f"{temp_folder}/repositories/{repository}/files.json", files_data, dataFolder=False)
+        if self.histories:
+            write_repository_history(repository)
 
         return files_count
 
     def unpack_and_select_files(self, out_siva):
         total_files = 0
         repos_num = 0
-        with Connector() as con:
-            for file in tqdm(out_siva):
-                do_bash_command(f"siva unpack {file} ./{siva_folder}/.git")
-                new_files_count = 0
+        for file in tqdm(out_siva):
+            siva_name = unpack_siva(file)
+            new_files_count = 0
 
-                siva_name = file.split('/')[-1][:-5]
-                repository = con.get_repository_by_siva(siva_name)
+            # copying files
+            for branch in head_branches():
+                checkout_branch(branch)
+                repo = repository_by_branch(branch)
+                if self.only_master:
+                    repo += "/master"
+                else:
+                    repo += '/' + siva_name
+                if repo is None:
+                    continue
+                if self.only_master and os.path.exists(os.path.join(self.target_directory + repo)):
+                    continue
+                new_files_count = self.copy_files_from_dir(siva_folder, repo)
+                repos_num += 1
+            total_files += new_files_count
 
-                # copying files
-                if checkout_branch():
-                    if repository is None:
-                        shutil.rmtree(siva_folder)
-                        #shutil.move(file, '/tmp/skipped-repos/'+siva_name+'.siva')
-                        continue
-                    new_files_count = self.copy_py3_files_from_dir(siva_folder, repository)
-                    repos_num += 1
-
-                total_files += new_files_count
-
-                # deleting the directory with siva files we have already used
-                shutil.rmtree(siva_folder)
-                os.remove(file)
+            # deleting the directory with siva files we have already used
+            shutil.rmtree(siva_folder)
+            os.remove(file)
         return total_files, repos_num
