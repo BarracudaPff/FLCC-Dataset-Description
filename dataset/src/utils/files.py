@@ -8,6 +8,19 @@ from tqdm import tqdm
 from src.config import dataDir, temp_folder
 
 
+def count_all_files(root, extension):
+    count = 0
+    if extension is not None:
+        for root, dirs, files in os.walk(root):
+            for file in files:
+                base, ext = os.path.splitext(file)
+                if ext == extension:
+                    count += 1
+    else:
+        count = sum([len(files) for r, d, files in os.walk(root)])
+    return count
+
+
 def select_all_files_with_extension(root, extension):
     if extension is None:
         raise TypeError("Extension can't be None")
