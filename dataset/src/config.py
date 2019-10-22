@@ -1,8 +1,11 @@
 import os
 
 statistic_folder = 'statistics'
+calibrate_folder = 'calibrates'
 dataDir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../data/')
-max_files_in_folder = 100
+
+renameLimit = 999999
+diff_filter = "ACDMR"
 
 # Temporary fields
 temp_folder = 'temp'
