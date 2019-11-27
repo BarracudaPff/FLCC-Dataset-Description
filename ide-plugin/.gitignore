@@ -1,3 +1,7 @@
 */vevn*/
 build
 .gradle
+
+# Auto generated stuff
+plugin.xml
+flcc.zip
