@@ -8,18 +8,20 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.util.registry.Registry
 import icons.PythonIcons
+import org.jetbrains.completion.full.line.settings.MLServerCompletionSettings
 
 class FullLineContributor : CompletionContributor() {
     companion object {
         const val FULL_LINE_TAIL_TEXT = "full-line"
+        private val settings = MLServerCompletionSettings.getInstance()
 
         val LOG = Logger.getInstance(FullLineContributor::class.java)
 
         val INSERT_HANDLER = FullLineInsertHandler()
 
         private fun completionServerUrl(): String {
-            val url = Registry.get("full.line.completion.server.url").asString()
-            val port = Registry.get("full.line.completion.server.port").asInteger()
+            val url = Registry.get("ml.server.completion.host").asString()
+            val port = Registry.get("ml.server.completion.port").asInteger()
             return "http://$url:$port"
         }
     }
@@ -30,7 +32,7 @@ class FullLineContributor : CompletionContributor() {
     )
 
     override fun fillCompletionVariants(parameters: CompletionParameters, result: CompletionResultSet) {
-        if (!Registry.`is`("full.line.completion.enable"))
+        if (!settings.enable)
             return
 
         val context = parameters.originalFile.text.substring(0, parameters.offset)
