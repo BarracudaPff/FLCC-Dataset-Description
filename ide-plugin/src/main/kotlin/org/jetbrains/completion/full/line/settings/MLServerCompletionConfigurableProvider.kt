@@ -7,7 +7,7 @@ import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.ui.Messages
 import com.intellij.util.ui.UIUtil
 import org.jetbrains.completion.full.line.settings.MLServerCompletionBundle.Companion.message
-import org.jetbrains.completion.full.line.utils.MLServerUtils
+import org.jetbrains.completion.full.line.utils.GPTServerUtils
 
 class ServerCompletionConfigurableProvider : ConfigurableProvider() {
     override fun createConfigurable(): Configurable? {
@@ -15,7 +15,7 @@ class ServerCompletionConfigurableProvider : ConfigurableProvider() {
 
         return MLServerCompletionConfigurable {
             println(MLServerCompletionSettings.getInstance())
-            MLServerUtils.getStatus().doWhenDone {
+            GPTServerUtils.getStatus().doWhenDone {
                 showSuccessfulConnectionMessage(project)
             }.doWhenRejected { message ->
                 showConnectionFailedMessage(project, message)
