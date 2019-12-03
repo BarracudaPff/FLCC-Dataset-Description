@@ -7,7 +7,7 @@ plugins {
 }
 
 group 'org.jetbrains.completion.full.line'
-version '0.0.2'
+version '0.0.3'
 
 sourceCompatibility = 1.8
 
@@ -34,6 +34,13 @@ patchPluginXml {
     untilBuild '201.*'
 
     changeNotes """
+        0.0.3 <br>
+        <ul>
+            <li>Add Settings for better UX. Settings -> Editor -> General -> Code Completion -> Server ML Completion</li>
+            <li>Add options for algorithm</li>
+            <li>Add options for completion mode</li>
+            <li>And other settings</li>
+        </ul>
         0.0.2 <br>
         <ul>
             <li>Create auto-generated root public.xml for downloading plugin</li>
