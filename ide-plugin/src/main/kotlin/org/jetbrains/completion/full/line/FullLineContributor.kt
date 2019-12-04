@@ -37,7 +37,6 @@ class FullLineContributor : CompletionContributor() {
         val filename = parameters.originalFile.name
 
         for (provider in providers) {
-            println(provider.getVariants(context, filename))
             for (variant in provider.getVariants(context, filename)) {
                 val lookupElementBuilder = LookupElementBuilder.create(variant)
                         .withTailText("  ${provider.description}", true)

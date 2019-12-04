@@ -45,7 +45,7 @@ class NetworkCompletionProvider(override val description: String, private val ur
     }
 
     private fun logError(msg: String, error: Exception): List<String> {
-        println("$error. $msg")
+        LOG.error(msg, error)
         return emptyList()
     }
 }
