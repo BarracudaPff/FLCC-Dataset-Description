@@ -37,9 +37,7 @@ patchPluginXml {
         0.0.3 <br>
         <ul>
             <li>Add Settings for better UX. Settings -> Editor -> General -> Code Completion -> Server ML Completion</li>
-            <li>Add options for algorithm</li>
-            <li>Add options for completion mode</li>
-            <li>And other settings</li>
+            <li>Add option to get extra settings for testing</li>
         </ul>
         0.0.2 <br>
         <ul>
