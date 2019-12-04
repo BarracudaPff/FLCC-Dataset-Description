@@ -14,7 +14,6 @@ class ServerCompletionConfigurableProvider : ConfigurableProvider() {
         val project = ProjectManager.getInstance().defaultProject
 
         return MLServerCompletionConfigurable {
-            println(MLServerCompletionSettings.getInstance())
             GPTServerUtils.getStatus().doWhenDone {
                 showSuccessfulConnectionMessage(project)
             }.doWhenRejected { message ->
