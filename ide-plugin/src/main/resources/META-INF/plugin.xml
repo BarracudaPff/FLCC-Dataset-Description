@@ -20,7 +20,7 @@
         <registryKey key="full.line.completion.server.url" defaultValue="34.210.4.157"
                      description="Full line completion server address"/>
 
-        <registryKey key="full.line.completion.server.port" defaultValue="5001"
+        <registryKey key="full.line.completion.server.port" defaultValue="5000"
                      description="Port for full line completion"/>
 
         <registryKey key="full.line.completion.enable" defaultValue="true"
