@@ -7,17 +7,14 @@ import org.jetbrains.completion.full.line.FullLineContributor.Companion.LOG
 import java.net.ConnectException
 import java.net.SocketTimeoutException
 import java.util.concurrent.ExecutionException
-import java.util.concurrent.locks.ReentrantLock
-import kotlin.concurrent.withLock
 
 abstract class FullLineCompletionProvider(open val description: String) {
-    private val communicationLock = ReentrantLock()
 
     abstract fun completionServerUrl(): String
 
     abstract fun sendAndReceiveRequest(r: HttpRequests.Request, context: String, filename: String): List<String>
 
-    fun getVariants(context: String, filename: String): List<String> = communicationLock.withLock {
+    fun getVariants(context: String, filename: String): List<String> {
         val start = System.currentTimeMillis()
 
         val future = ApplicationManager.getApplication().executeOnPooledThread<List<String>> {
@@ -43,7 +40,6 @@ abstract class FullLineCompletionProvider(open val description: String) {
         LOG.debug("Time to predict completions is ${(System.currentTimeMillis() - start) / 1000}")
         return future.get()
     }
-
 
     fun logError(msg: String, error: Exception): List<String> {
         LOG.error(msg, error)
