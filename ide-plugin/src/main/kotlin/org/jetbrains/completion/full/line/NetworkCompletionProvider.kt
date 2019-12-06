@@ -1,52 +1,27 @@
 package org.jetbrains.completion.full.line
 
 import com.google.gson.Gson
-import com.intellij.codeInsight.completion.impl.CompletionServiceImpl
-import com.intellij.openapi.application.ex.ApplicationUtil
+import com.intellij.openapi.util.registry.Registry
 import com.intellij.util.io.HttpRequests
-import org.jetbrains.completion.full.line.FullLineContributor.Companion.LOG
 import org.jetbrains.completion.full.line.models.FullLineCompletionRequest
 import org.jetbrains.completion.full.line.models.FullLineCompletionResult
-import java.net.ConnectException
-import java.net.SocketTimeoutException
-import java.util.concurrent.Callable
-import java.util.concurrent.ExecutionException
 
-class NetworkCompletionProvider(override val description: String, private val url: String) :
-        FullLineCompletionProvider {
-    override fun getVariants(context: String, filename: String): List<String> {
-        return try {
-            val start = System.currentTimeMillis()
-            val completions = ApplicationUtil.runWithCheckCanceled(Callable {
-                return@Callable HttpRequests.post(url, "application/json").gzip(true)
-                        .connect { r ->
-                            val offset = context.length
-                            val token = TextUtils.getLastToken(context)
+class NetworkCompletionProvider(override val description: String) :
+        FullLineCompletionProvider(description) {
 
-                            val request = FullLineCompletionRequest(context, token, offset, filename)
-                            r.write(Gson().toJson(request))
-
-                            Gson().fromJson(r.reader, FullLineCompletionResult::class.java).completions
-                        }
-                //ProgressIndicatorProvider.getInstance().progressIndicator
-            }, CompletionServiceImpl.getCurrentCompletionProgressIndicator())
-            LOG.debug("Time to predict completions is ${(System.currentTimeMillis() - start) / 1000}")
-            completions
-
-        } catch (e: Exception) {
-            val message = when (e) {
-                is ConnectException                             -> return emptyList()
-                is SocketTimeoutException                       -> "Timeout. Probably IP is wrong"
-                is HttpRequests.HttpStatusException             -> "Something wrong with completion server"
-                is ExecutionException, is IllegalStateException -> "Error while getting completions from server"
-                else                                            -> "Some other error occurred"
-            }
-            return logError(message, e)
-        }
+    override fun completionServerUrl(): String {
+        val url = Registry.get("full.line.completion.server.url").asString()
+        val port = Registry.get("full.line.completion.server.port").asInteger()
+        return "http://$url:$port/v1/complete/gpt"
     }
 
-    private fun logError(msg: String, error: Exception): List<String> {
-        LOG.error(msg, error)
-        return emptyList()
+    override fun sendAndReceiveRequest(r: HttpRequests.Request, context: String, filename: String): List<String> {
+        val offset = context.length
+        val token = TextUtils.getLastToken(context)
+
+        val request = FullLineCompletionRequest(context, token, offset, filename)
+        r.write(Gson().toJson(request))
+
+        return Gson().fromJson(r.reader, FullLineCompletionResult::class.java).completions
     }
 }

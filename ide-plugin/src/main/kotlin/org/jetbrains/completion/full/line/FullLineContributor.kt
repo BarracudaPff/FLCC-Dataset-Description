@@ -16,16 +16,10 @@ class FullLineContributor : CompletionContributor() {
         val LOG = Logger.getInstance(FullLineContributor::class.java)
 
         val INSERT_HANDLER = FullLineInsertHandler()
-
-        private fun completionServerUrl(): String {
-            val url = Registry.get("full.line.completion.server.url").asString()
-            val port = Registry.get("full.line.completion.server.port").asInteger()
-            return "http://$url:$port"
-        }
     }
 
     private val providers: List<FullLineCompletionProvider> = listOf(
-            NetworkCompletionProvider("gpt", "${completionServerUrl()}/v1/complete/gpt")
+            NetworkCompletionProvider("gpt")
             //NetworkCompletionProvider("char-rnn", "${completionServerUrl()}/v1/complete/charrnn")
     )
 
