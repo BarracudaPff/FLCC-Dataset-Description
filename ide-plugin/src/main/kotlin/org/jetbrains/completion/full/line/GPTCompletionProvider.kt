@@ -16,7 +16,7 @@ class GPTCompletionProvider(private val host: String, private val port: Int) {
 
     fun getVariants(context: String, filename: String): List<String> {
         val start = System.currentTimeMillis()
-        val future = SequentialTaskExecutor.createSequentialApplicationPoolExecutor("Some name").submit<List<String>> {
+        val future = SequentialTaskExecutor.createSequentialApplicationPoolExecutor(javaClass.simpleName).submit<List<String>> {
             try {
                 HttpRequests.post("http://$host:$port/v1/complete/gpt", "application/json")
                         .connect { r ->
