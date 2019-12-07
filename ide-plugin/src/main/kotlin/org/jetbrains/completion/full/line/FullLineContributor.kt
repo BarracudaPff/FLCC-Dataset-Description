@@ -17,8 +17,8 @@ class FullLineContributor : CompletionContributor() {
 
         val INSERT_HANDLER = FullLineInsertHandler()
 
-        private val host = Registry.get("ml.server.completion.host").asString()
-        private val port = Registry.get("ml.server.completion.port").asInteger()
+        private val host = Registry.get("full.line.completion.server.url").asString()
+        private val port = Registry.get("full.line.completion.server.port").asInteger()
     }
 
     private val provider = GPTCompletionProvider(host, port)

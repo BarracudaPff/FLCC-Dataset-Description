@@ -1,9 +1,9 @@
 package org.jetbrains.completion.full.line
 
 import com.google.gson.Gson
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.progress.util.ProgressIndicatorUtils
+import com.intellij.util.concurrency.SequentialTaskExecutor
 import com.intellij.util.io.HttpRequests
 import org.jetbrains.completion.full.line.models.FullLineCompletionRequest
 import org.jetbrains.completion.full.line.models.FullLineCompletionResult
@@ -16,7 +16,7 @@ class GPTCompletionProvider(private val host: String, private val port: Int) {
 
     fun getVariants(context: String, filename: String): List<String> {
         val start = System.currentTimeMillis()
-        val future = ApplicationManager.getApplication().executeOnPooledThread<List<String>> {
+        val future = SequentialTaskExecutor.createSequentialApplicationPoolExecutor("Some name").submit<List<String>> {
             try {
                 HttpRequests.post("http://$host:$port/v1/complete/gpt", "application/json")
                         .connect { r ->
@@ -30,7 +30,7 @@ class GPTCompletionProvider(private val host: String, private val port: Int) {
                         }
             } catch (e: Exception) {
                 val message = when (e) {
-                    is ConnectException                             -> return@executeOnPooledThread emptyList()
+                    is ConnectException                             -> return@submit emptyList()
                     is SocketTimeoutException                       -> "Timeout. Probably IP is wrong"
                     is HttpRequests.HttpStatusException             -> "Something wrong with completion server"
                     is ExecutionException, is IllegalStateException -> "Error while getting completions from server"
