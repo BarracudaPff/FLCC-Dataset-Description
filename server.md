@@ -8,7 +8,7 @@ Creating scalable service for completion on python.
 So the structure is
 <pre>  
 Action ─> Service ─> Connector
-                  └─> Fetcher
+                  └─> Generator
 </pre>
 
 ## Definitions:
