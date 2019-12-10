@@ -8,26 +8,46 @@ data class FullLineCompletionRequest(
         val token: String,
         val offset: Int,
         val filename: String,
-        val branches: Int,
-
+        @SerializedName("branches")
+        val suggestions: Int,
         val tokens: Int,
-        val mode: FullLineCompletionMode,
-        val generator: FullLineCompletionAlgorithm,
 
+        val mode: FullLineCompletionMode,
+        @SerializedName("generator")
+        val algorithm: FullLineCompletionAlgorithm,
+
+        @SerializedName("num_iterations")
+        val numIterations: Int,
         @SerializedName("beam_size")
         val beamSize: Int,
-
+        @SerializedName("diversity_groups")
+        val diversityGroups: Int,
         @SerializedName("diversity_strength")
         val diversityStrength: Double,
 
-        @SerializedName("top_n")
-        val topN: Int,
         @SerializedName("use_top_n")
         val useTopN: Boolean,
+        @SerializedName("top_n")
+        val topN: Int,
         @SerializedName("only_full_lines")
-        val onlyFullLines:Boolean
+        val onlyFullLines: Boolean
 ) {
-    constructor(code: String, prefix: String, offset: Int, filename: String, settings: MLServerCompletionSettings)
-            : this(code, prefix, offset, filename, settings.suggestions, settings.tokens, settings.mode,
-            settings.algorithm, settings.beamSize, settings.diversityStrength, settings.topN, settings.useTopN, settings.onlyFullLines)
+    constructor(code: String, prefix: String, offset: Int, filename: String, settings: MLServerCompletionSettings) : this(
+            code,
+            prefix,
+            offset,
+            filename,
+            suggestions = settings.suggestions,
+            tokens = settings.tokens,
+            mode = settings.mode,
+            algorithm = settings.algorithm,
+            numIterations = settings.numIterations,
+            beamSize = settings.beamSize,
+            diversityGroups = settings.diversityGroups,
+            diversityStrength = settings.diversityStrength,
+            useTopN = settings.useTopN,
+            topN = settings.topN,
+            onlyFullLines = settings.onlyFullLines
+    )
 }
+
