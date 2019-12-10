@@ -37,6 +37,11 @@ patchPluginXml {
     untilBuild '201.*'
 
     changeNotes """
+        0.0.3 <br>
+        <ul>
+            <li>Add Settings for better UX. Settings -> Editor -> General -> Code Completion -> Server ML Completion</li>
+            <li>Add option to get extra settings for testing</li>
+        </ul>
         0.0.2 <br>
         <ul>
             <li>Create auto-generated root public.xml for downloading plugin</li>
