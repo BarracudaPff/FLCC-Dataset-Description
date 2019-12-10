@@ -15,6 +15,7 @@ class MLServerCompletionSettings : PersistentStateComponent<MLServerCompletionSe
         return state
     }
 
+    @Suppress("DuplicatedCode")
     override fun loadState(state: State) {
         this.enable = state.enable
         this.mode = state.mode
@@ -35,6 +36,7 @@ class MLServerCompletionSettings : PersistentStateComponent<MLServerCompletionSe
         this.experimental = state.experimental
         this.enableTemplateWalking = state.enableTemplateWalking
         this.enableComments = state.enableComments
+        this.onlyFullLines = state.onlyFullLines
     }
 
     var tokens: Int
@@ -118,6 +120,11 @@ class MLServerCompletionSettings : PersistentStateComponent<MLServerCompletionSe
         set(value) {
             state.enableComments = value
         }
+    var onlyFullLines: Boolean
+        get() = state.onlyFullLines
+        set(value) {
+            state.onlyFullLines = value
+        }
 
     companion object {
         fun getInstance(): MLServerCompletionSettings {
@@ -144,5 +151,6 @@ class MLServerCompletionSettings : PersistentStateComponent<MLServerCompletionSe
         var experimental = false
         var enableTemplateWalking = true
         var enableComments = true
+        var onlyFullLines = false
     }
 }

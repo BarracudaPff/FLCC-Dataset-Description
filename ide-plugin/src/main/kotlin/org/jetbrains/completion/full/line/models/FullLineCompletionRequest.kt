@@ -23,10 +23,11 @@ data class FullLineCompletionRequest(
         @SerializedName("top_n")
         val topN: Int,
         @SerializedName("use_top_n")
-        val useTopN: Boolean
-
+        val useTopN: Boolean,
+        @SerializedName("only_full_lines")
+        val onlyFullLines:Boolean
 ) {
     constructor(code: String, prefix: String, offset: Int, filename: String, settings: MLServerCompletionSettings)
             : this(code, prefix, offset, filename, settings.suggestions, settings.tokens, settings.mode,
-            settings.algorithm, settings.beamSize, settings.diversityStrength, settings.topN, settings.useTopN)
+            settings.algorithm, settings.beamSize, settings.diversityStrength, settings.topN, settings.useTopN, settings.onlyFullLines)
 }

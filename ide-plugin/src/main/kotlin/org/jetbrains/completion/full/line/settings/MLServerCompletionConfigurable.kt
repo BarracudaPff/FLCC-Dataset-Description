@@ -92,6 +92,10 @@ class MLServerCompletionConfigurable(private val event: (event: ActionEvent) -> 
                         row {
                             checkBox(message("ml.server.completion.enable.comments"), settings::enableComments)
                         }
+
+                        row {
+                            checkBox(message("ml.server.completion.only.full"), settings::onlyFullLines)
+                        }
                     }.enableSubRowsIf(gpt)
                 }
             }
