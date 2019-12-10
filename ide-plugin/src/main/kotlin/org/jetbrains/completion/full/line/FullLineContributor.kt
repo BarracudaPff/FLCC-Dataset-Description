@@ -7,6 +7,7 @@ import com.intellij.codeInsight.completion.PrioritizedLookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.util.registry.Registry
 import com.intellij.psi.util.elementType
 import com.jetbrains.python.PyTokenTypes
 import icons.PythonIcons
@@ -19,7 +20,7 @@ import org.jetbrains.completion.full.line.settings.MLServerCompletionSettings
 import javax.swing.Icon
 
 class FullLineContributor : CompletionContributor() {
-    private val provider = GPTCompletionProvider()
+    private val provider = GPTCompletionProvider(host, port)
     private val settings = MLServerCompletionSettings.getInstance()
     private val service: NextLevelFullLineCompletion = ServiceManager.getService(NextLevelFullLineCompletion::class.java)
 
@@ -52,7 +53,7 @@ class FullLineContributor : CompletionContributor() {
             val element = LookupElementBuilder.create(service.firstLine!!)
                     .withTypeText(FULL_LINE_TAIL_TEXT)
                     .withInsertHandler(FullLineInsertHandler(supporter))
-                    .withTailText(GPT_TAIL_TEXT, true)
+                    .withTailText(provider.description, true)
                     .withIcon(GPT_ICON)
 
             result.addElement(PrioritizedLookupElement.withPriority(element, 1000000.0))
@@ -69,14 +70,16 @@ class FullLineContributor : CompletionContributor() {
             LookupElementBuilder.create(variant)
                     .withTypeText(FULL_LINE_TAIL_TEXT)
                     .withInsertHandler(FullLineInsertHandler(supporter))
-        }.withTailText(GPT_TAIL_TEXT, true).withIcon(GPT_ICON)
+        }.withTailText(provider.description, true).withIcon(GPT_ICON)
     }
 
     companion object {
         val LOG = Logger.getInstance(FullLineContributor::class.java)
 
+        val host = Registry.get("full.line.completion.server.url").asString()
+        val port = Registry.get("full.line.completion.server.port").asInteger()
+
         const val FULL_LINE_TAIL_TEXT = "full-line"
-        const val GPT_TAIL_TEXT = "\tgpt"
         val GPT_ICON: Icon = PythonIcons.Python.Python
     }
 }

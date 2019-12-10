@@ -1,12 +1,16 @@
 package org.jetbrains.completion.full.line
 
 import com.google.gson.Gson
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.progress.util.ProgressIndicatorUtils
+import com.intellij.openapi.util.ActionCallback
 import com.intellij.util.concurrency.SequentialTaskExecutor
 import com.intellij.util.io.HttpRequests
 import org.jetbrains.completion.full.line.models.FullLineCompletionRequest
 import org.jetbrains.completion.full.line.models.FullLineCompletionResult
+import org.jetbrains.completion.full.line.settings.MLServerCompletionBundle
+import org.jetbrains.completion.full.line.settings.MLServerCompletionSettings
 import java.net.ConnectException
 import java.net.SocketTimeoutException
 import java.util.concurrent.ExecutionException
@@ -16,7 +20,7 @@ class GPTCompletionProvider(private val host: String, private val port: Int) {
     val description = "  gpt"
     private val lock = ReentrantLock()
 
-    fun getVariants(context: String, filename: String): List<String> {
+    fun getVariants(context: String, filename: String, prefix: String): List<String> {
         val start = System.currentTimeMillis()
         val future = SequentialTaskExecutor.createSequentialApplicationPoolExecutor(javaClass.simpleName)
                 .submit<List<String>> {
@@ -24,10 +28,13 @@ class GPTCompletionProvider(private val host: String, private val port: Int) {
                         try {
                             HttpRequests.post("http://$host:$port/v1/complete/gpt", "application/json")
                                     .connect { r ->
-                                        val offset = context.length
-                                        val token = TextUtils.getLastToken(context)
+                                        val request = FullLineCompletionRequest(
+                                                context,
+                                                prefix,
+                                                context.length-prefix.length,
+                                                filename,
+                                                MLServerCompletionSettings.getInstance())
 
-                                        val request = FullLineCompletionRequest(context, token, offset, filename)
                                         r.write(Gson().toJson(request))
 
                                         Gson().fromJson(r.reader, FullLineCompletionResult::class.java).completions
@@ -66,6 +73,28 @@ class GPTCompletionProvider(private val host: String, private val port: Int) {
             return action()
         } finally {
             unlock()
+        }
+    }
+
+    fun getStatus(): ActionCallback {
+        val callback = ActionCallback()
+        ApplicationManager.getApplication().executeOnPooledThread {
+            doUpdateAndShowResult(callback)
+        }
+        return callback
+    }
+
+    private fun doUpdateAndShowResult(callback: ActionCallback) {
+        try {
+            if (HttpRequests.request("http://$host:$port/v1/status").tryConnect() == 200) {
+                callback.setDone()
+            } else {
+                callback.reject(MLServerCompletionBundle.message("ml.server.completion.gpt.connection.error"))
+            }
+        } catch (e: SocketTimeoutException) {
+            callback.reject(MLServerCompletionBundle.message("ml.server.completion.gpt.connection.timeout"))
+        } catch (e: Exception) {
+            callback.reject(e.localizedMessage)
         }
     }
 
