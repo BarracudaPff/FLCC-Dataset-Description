@@ -76,8 +76,8 @@ class FullLineContributor : CompletionContributor() {
     companion object {
         val LOG = Logger.getInstance(FullLineContributor::class.java)
 
-        val host = Registry.get("full.line.completion.server.url").asString()
-        val port = Registry.get("full.line.completion.server.port").asInteger()
+        val host = Registry.get("ml.server.completion.host").asString()
+        val port = Registry.get("ml.server.completion.port").asInteger()
 
         const val FULL_LINE_TAIL_TEXT = "full-line"
         val GPT_ICON: Icon = PythonIcons.Python.Python

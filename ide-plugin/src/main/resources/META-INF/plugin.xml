@@ -18,12 +18,12 @@
                 serviceImplementation="org.jetbrains.completion.full.line.services.NextLevelFullLineCompletionImpl"/>
         <completion.contributor language="Python"
                                 id="FullLineCompletionContributor"
-                                order="last"
+                                order="first"
                                 implementationClass="org.jetbrains.completion.full.line.FullLineContributor"/>
         <registryKey key="ml.server.completion.host" defaultValue="34.210.4.157"
                      description="Full line completion server address"/>
 
-        <registryKey key="ml.server.completion.port" defaultValue="5000"
+        <registryKey key="ml.server.completion.port" defaultValue="5001"
                      description="Port for full line completion"/>
 
         <codeCompletionConfigurable id="ml.server.completion"
