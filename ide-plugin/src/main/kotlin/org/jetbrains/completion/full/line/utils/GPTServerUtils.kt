@@ -18,7 +18,7 @@ object GPTServerUtils {
     private val host = Registry.get("ml.server.completion.host").asString()
     private val port = Registry.get("ml.server.completion.port").asInteger()
 
-    private val completionURL = "http://$host:$port/v1/complete/gpt"
+    private val completionURL = "http://$host:$port/v1/status"
     private val statusURL = "http://$host:$port/v1/complete/gpt"
 
     fun getCompletions(context: String, filename: String, prefix: String): List<String> {
@@ -28,7 +28,7 @@ object GPTServerUtils {
                         val request = FullLineCompletionRequest(
                                 context,
                                 prefix,
-                                context.length,
+                                context.length-prefix.length,
                                 filename,
                                 MLServerCompletionSettings.getInstance())
 
