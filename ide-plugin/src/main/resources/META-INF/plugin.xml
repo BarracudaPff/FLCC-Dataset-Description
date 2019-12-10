@@ -18,7 +18,7 @@
                 serviceImplementation="org.jetbrains.completion.full.line.services.NextLevelFullLineCompletionImpl"/>
         <completion.contributor language="Python"
                                 id="FullLineCompletionContributor"
-                                order="first"
+                                order="last"
                                 implementationClass="org.jetbrains.completion.full.line.FullLineContributor"/>
         <registryKey key="ml.server.completion.host" defaultValue="34.210.4.157"
                      description="Full line completion server address"/>

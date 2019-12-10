@@ -53,16 +53,7 @@ patchPluginXml {
         """
 }
 
-task copyPlugin(type: Copy) {
-    from buildPlugin
-    into rootDir
-    rename { String fileName ->
-        fileName.replace(fileName, gradle.ext.pluginName)
-    }
-}
-
 task generatePublicXML {
-    dependsOn(copyPlugin)
     doLast {
         file("plugin.xml").withWriter { writer ->
             def xml = new MarkupBuilder(new IndentPrinter(writer, "    ", true))
@@ -83,7 +74,7 @@ task generatePublicXML {
                     xml.version(version)
                     'idea-version'("since-build": "193")
                     vendor('url': 'https://www.jetbrains.com', "JetBrains")
-                    'download-url'(gradle.ext.pluginName)
+                    'download-url'(buildPlugin.archiveFileName.get())
                     xml.description {
                         mkp.yieldUnescaped('<![CDATA[\n' +
                                 '           <p>A prototype for showing full line code completion variants in IntelliJ</p>\n' +
@@ -99,7 +90,7 @@ task generatePublicXML {
 
 intellij {
     version '193.4778.7-EAP-SNAPSHOT'
-    plugins "PythonCore:193.4778.7", "sh", 'java'
+    plugins "PythonCore:193.4778.7"
 }
 
 runIde {
