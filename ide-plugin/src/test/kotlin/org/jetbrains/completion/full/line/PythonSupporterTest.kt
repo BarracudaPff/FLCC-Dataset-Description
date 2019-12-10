@@ -24,8 +24,85 @@ class PythonSupporterTest {
         assertEquals(expectedToken, supporter.getLastToken(line))
     }
 
+    @ParameterizedTest
+    @MethodSource("getMatchesData")
+    fun `test quotes`(line: String, expectedLine: String?, values: List<String>) {
+        val supporter = PythonSupporter()
+        val matches =  supporter.prepareDataForTemplate(line)
+        assertEquals(expectedLine, matches.first)
+        assertEquals(values, matches.second)
+    }
+
+    @ParameterizedTest
+    @MethodSource("lastTokenData")
+    fun `test missing braces`(line: String, expectedToken: String?) {
+        val supporter = PythonSupporter()
+        assertEquals(expectedToken, supporter.getLastToken(line))
+    }
+
     @Suppress("unused")
     companion object {
+        @JvmStatic
+        private fun getMatchesData(): Stream<Arguments> {
+            return Stream.of(
+                    Arguments.of("with open(\"hi.py\") as f:",
+                            "with open(\"\$__Variable0\$\") as f:",
+                            listOf("hi.py")),
+
+                    Arguments.of("with open(\"'hi.py\") as f:",
+                            "with open(\"\$__Variable0\$\") as f:",
+                            listOf("'hi.py")),
+
+                    Arguments.of("with open(\"'hi.py'\") as f:",
+                            "with open(\"\$__Variable0\$\") as f:",
+                            listOf("'hi.py'")),
+
+                    Arguments.of("with open(\"\\\"hi.py\") as f:",
+                            "with open(\"\$__Variable0\$\") as f:",
+                            listOf("\\\"hi.py")),
+
+                    Arguments.of("with open(\"\\\"hi.py\\\"\") as f:",
+                            "with open(\"\$__Variable0\$\") as f:",
+                            listOf("\\\"hi.py\\\"")),
+
+                    Arguments.of("with open('hi.py') as f:",
+                            "with open('\$__Variable0\$') as f:",
+                            listOf("hi.py")),
+
+                    Arguments.of("with open('\"hi.py') as f:",
+                            "with open('\$__Variable0\$') as f:",
+                            listOf("\"hi.py")),
+
+                    Arguments.of("with open('\"hi.py\"') as f:",
+                            "with open('\$__Variable0\$') as f:",
+                            listOf("\"hi.py\"")),
+
+                    Arguments.of("with open('\\'hi.py') as f:",
+                            "with open('\$__Variable0\$') as f:",
+                            listOf("\\'hi.py")),
+
+                    Arguments.of("with open('\\'hi.py\\'') as f:",
+                            "with open('\$__Variable0\$') as f:",
+                            listOf("\\'hi.py\\'")),
+
+                    Arguments.of("with open('hi.py', 'hello.py') as f:",
+                            "with open('\$__Variable0\$', '\$__Variable1\$') as f:",
+                            listOf("hi.py", "hello.py")),
+
+                    Arguments.of("with open('hi.py', 'hello.py', 'hey.py') as f:",
+                            "with open('\$__Variable0\$', '\$__Variable1\$', '\$__Variable2\$') as f:",
+                            listOf("hi.py", "hello.py", "hey.py")),
+
+                    Arguments.of("with open('hi.py', \"hello.py\", 'hey.py') as f:",
+                            "with open('\$__Variable0\$', \"\$__Variable1\$\", '\$__Variable2\$') as f:",
+                            listOf("hi.py", "hello.py", "hey.py")),
+
+                    Arguments.of("with open('hi.py', \"hello.py\", 'hey.py\") as f:",
+                            "with open('\$__Variable0\$', \"\$__Variable1\$\", 'hey.py\") as f:",
+                            listOf("hi.py", "hello.py"))
+            )
+        }
+
         @JvmStatic
         private fun firstTokenData(): Stream<Arguments> =
                 Stream.of(
