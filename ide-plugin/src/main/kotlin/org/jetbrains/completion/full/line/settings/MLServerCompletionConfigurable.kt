@@ -81,6 +81,14 @@ class MLServerCompletionConfigurable(private val event: (event: ActionEvent) -> 
                         row {
                             checkBox(message("ml.server.completion.experimental"), settings::experimental)
                         }
+
+                        row {
+                            checkBox(message("ml.server.completion.enable.template.walking"), settings::enableTemplateWalking)
+                        }
+
+                        row {
+                            checkBox(message("ml.server.completion.enable.comments"), settings::enableComments)
+                        }
                     }.enableSubRowsIf(gpt)
                 }
             }

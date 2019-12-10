@@ -33,6 +33,8 @@ class MLServerCompletionSettings : PersistentStateComponent<MLServerCompletionSe
         this.autoPopup = state.autoPopup
         this.filter = state.filter
         this.experimental = state.experimental
+        this.enableTemplateWalking = state.enableTemplateWalking
+        this.enableComments = state.enableComments
     }
 
     var tokens: Int
@@ -106,6 +108,16 @@ class MLServerCompletionSettings : PersistentStateComponent<MLServerCompletionSe
         set(value) {
             state.experimental = value
         }
+    var enableTemplateWalking: Boolean
+        get() = state.enableTemplateWalking
+        set(value) {
+            state.enableTemplateWalking = value
+        }
+    var enableComments: Boolean
+        get() = state.enableComments
+        set(value) {
+            state.enableComments = value
+        }
 
     companion object {
         fun getInstance(): MLServerCompletionSettings {
@@ -130,5 +142,7 @@ class MLServerCompletionSettings : PersistentStateComponent<MLServerCompletionSe
         var diversityStrength = 0.3
 
         var experimental = false
+        var enableTemplateWalking = true
+        var enableComments = true
     }
 }
