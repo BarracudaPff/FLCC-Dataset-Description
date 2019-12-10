@@ -1,9 +1,10 @@
 package org.jetbrains.completion.full.line.language
 
+import com.intellij.codeInsight.template.impl.TemplateImpl
 import com.intellij.lang.Language
 
 interface LanguageMLSupporter {
-    fun check(variant: String): Boolean
+    fun isCorrect(variant: String): Boolean
 
     fun getFirstToken(line: String): String?
 
@@ -12,6 +13,8 @@ interface LanguageMLSupporter {
     fun getPrefix(line: String): String {
         return getLastToken(line) ?: ""
     }
+
+    fun createTemplate(variant: String): TemplateImpl?
 
     companion object {
         fun getInstance(language: Language): LanguageMLSupporter? {
@@ -22,4 +25,5 @@ interface LanguageMLSupporter {
         }
     }
 
+    fun getMissingBraces(line: String): List<Char>?
 }
