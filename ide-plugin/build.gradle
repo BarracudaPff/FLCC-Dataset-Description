@@ -7,7 +7,7 @@ plugins {
 }
 
 group 'org.jetbrains.completion.full.line'
-version '0.0.2'
+version '0.0.5'
 
 sourceCompatibility = 1.8
 
