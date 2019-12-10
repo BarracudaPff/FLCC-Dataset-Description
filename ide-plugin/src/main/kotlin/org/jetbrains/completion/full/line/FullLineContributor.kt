@@ -7,6 +7,8 @@ import com.intellij.codeInsight.completion.PrioritizedLookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.psi.util.elementType
+import com.jetbrains.python.PyTokenTypes
 import icons.PythonIcons
 import org.jetbrains.completion.full.line.handlers.FullLineInsertHandler
 import org.jetbrains.completion.full.line.handlers.OneTokenHandler
@@ -22,35 +24,36 @@ class FullLineContributor : CompletionContributor() {
     private val service: NextLevelFullLineCompletion = ServiceManager.getService(NextLevelFullLineCompletion::class.java)
 
     override fun fillCompletionVariants(parameters: CompletionParameters, result: CompletionResultSet) {
-        if (!settings.enable || (parameters.isAutoPopup && !settings.autoPopup))
+        if (!settings.enable
+                || (parameters.isAutoPopup && !settings.autoPopup)
+                || parameters.position.elementType == PyTokenTypes.END_OF_LINE_COMMENT)
             return
 
         val supporter = LanguageMLSupporter.getInstance(parameters.originalFile.language) ?: return
 
-        handleFirstLine(result)
+        handleFirstLine(result, supporter)
 
         val context = parameters.originalFile.text.substring(0, parameters.offset)
         val filename = parameters.originalFile.name
         val prefix = supporter.getPrefix(context)
 
         for (variant in provider.getVariants(context, filename, prefix)) {
-            if (settings.filter && !supporter.check(variant)) {
+            if (settings.filter && !supporter.isCorrect(variant)) {
                 continue
             }
 
             val lookupElementBuilder = getLookupElementBuilder(supporter, variant) ?: continue
-
-            result.addElement(PrioritizedLookupElement.withPriority(lookupElementBuilder, 200000.0))
+            result.addElement(PrioritizedLookupElement.withPriority(lookupElementBuilder, 100000.0))
         }
     }
 
-    private fun handleFirstLine(result: CompletionResultSet) {
+    private fun handleFirstLine(result: CompletionResultSet, supporter: LanguageMLSupporter) {
         if (service.firstLine != null) {
             val element = LookupElementBuilder.create(service.firstLine!!)
                     .withTypeText(FULL_LINE_TAIL_TEXT)
-                    .withInsertHandler(FullLineInsertHandler())
+                    .withInsertHandler(FullLineInsertHandler(supporter))
                     .withTailText(GPT_TAIL_TEXT, true)
-                    .withIcon(FULL_LINE_ICON)
+                    .withIcon(GPT_ICON)
 
             result.addElement(PrioritizedLookupElement.withPriority(element, 1000000.0))
             service.firstLine = null
@@ -65,8 +68,8 @@ class FullLineContributor : CompletionContributor() {
         } else {
             LookupElementBuilder.create(variant)
                     .withTypeText(FULL_LINE_TAIL_TEXT)
-                    .withInsertHandler(FullLineInsertHandler())
-        }.withTailText(GPT_TAIL_TEXT, true).withIcon(FULL_LINE_ICON)
+                    .withInsertHandler(FullLineInsertHandler(supporter))
+        }.withTailText(GPT_TAIL_TEXT, true).withIcon(GPT_ICON)
     }
 
     companion object {
@@ -74,6 +77,6 @@ class FullLineContributor : CompletionContributor() {
 
         const val FULL_LINE_TAIL_TEXT = "full-line"
         const val GPT_TAIL_TEXT = "\tgpt"
-        val FULL_LINE_ICON: Icon = PythonIcons.Python.Python
+        val GPT_ICON: Icon = PythonIcons.Python.Python
     }
 }
