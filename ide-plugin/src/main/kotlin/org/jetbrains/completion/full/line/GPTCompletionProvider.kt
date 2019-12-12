@@ -17,7 +17,7 @@ class GPTCompletionProvider(private val host: String, private val port: Int) {
 
     fun getVariants(context: String, filename: String): List<String> {
         val start = System.currentTimeMillis()
-        val future = submitPool {
+        val future = submit {
             try {
                 HttpRequests.post("http://$host:$port/v1/complete/gpt", "application/json")
                         .connect { r ->
@@ -31,7 +31,7 @@ class GPTCompletionProvider(private val host: String, private val port: Int) {
                         }
             } catch (e: Exception) {
                 val message = when (e) {
-                    is ConnectException                             -> return@submitPool emptyList()
+                    is ConnectException                             -> return@submit emptyList()
                     is SocketTimeoutException                       -> "Timeout. Probably IP is wrong"
                     is HttpRequests.HttpStatusException             -> "Something wrong with completion server"
                     is ExecutionException, is IllegalStateException -> "Error while getting completions from server"
@@ -52,7 +52,7 @@ class GPTCompletionProvider(private val host: String, private val port: Int) {
         return emptyList()
     }
 
-    private fun submitPool(task: () -> List<String>): Future<List<String>> {
+    private fun submit(task: () -> List<String>): Future<List<String>> {
         if (executor.queue.size > 0) {
             executor.queue.poll()
         }
