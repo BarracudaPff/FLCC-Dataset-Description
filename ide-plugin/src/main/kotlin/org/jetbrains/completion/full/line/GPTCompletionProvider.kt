@@ -1,9 +1,9 @@
 package org.jetbrains.completion.full.line
 
 import com.google.gson.Gson
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.progress.util.ProgressIndicatorUtils
+import com.intellij.util.concurrency.AppExecutorUtil
 import com.intellij.util.io.HttpRequests
 import org.jetbrains.completion.full.line.models.FullLineCompletionRequest
 import org.jetbrains.completion.full.line.models.FullLineCompletionResult
@@ -17,7 +17,7 @@ class GPTCompletionProvider(private val host: String, private val port: Int) {
 
     fun getVariants(context: String, filename: String): List<String> {
         val start = System.currentTimeMillis()
-        val future = ApplicationManager.getApplication().executeOnPooledThread(Callable<List<String>> {
+        val future = executor.submit(Callable<List<String>> {
             try {
                 HttpRequests.post("http://$host:$port/v1/complete/gpt", "application/json")
                         .connect { r ->
@@ -54,5 +54,7 @@ class GPTCompletionProvider(private val host: String, private val port: Int) {
 
     companion object {
         private val LOG = Logger.getInstance(FullLineContributor::class.java)
+
+        private val executor = AppExecutorUtil.createBoundedApplicationPoolExecutor("ML Server Completion", 8)
     }
 }
