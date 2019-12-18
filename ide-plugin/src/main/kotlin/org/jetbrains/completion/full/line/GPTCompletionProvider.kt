@@ -55,6 +55,6 @@ class GPTCompletionProvider(private val host: String, private val port: Int) {
     companion object {
         private val LOG = Logger.getInstance(FullLineContributor::class.java)
 
-        private val executor = AppExecutorUtil.createBoundedApplicationPoolExecutor("ML Server Completion", 8)
+        private val executor = AppExecutorUtil.createBoundedApplicationPoolExecutor("ML Server Completion", 2)
     }
 }
