@@ -55,6 +55,8 @@ class GPTCompletionProvider(private val host: String, private val port: Int) {
     companion object {
         private val LOG = Logger.getInstance(FullLineContributor::class.java)
 
+        //Completion server cancels all threads besides the last one
+        //We need at least 2 threads, the second one must (almost) instantly cancel the first one, otherwise, UI will freeze
         private val executor = AppExecutorUtil.createBoundedApplicationPoolExecutor("ML Server Completion", 2)
     }
 }
