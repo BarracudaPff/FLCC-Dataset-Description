@@ -1,18 +1,22 @@
 package org.jetbrains.completion.full.line
 
 import com.google.gson.Gson
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.progress.util.ProgressIndicatorUtils
+import com.intellij.openapi.util.ActionCallback
+import com.intellij.openapi.util.registry.Registry
 import com.intellij.util.concurrency.AppExecutorUtil
 import com.intellij.util.io.HttpRequests
 import org.jetbrains.completion.full.line.models.FullLineCompletionRequest
 import org.jetbrains.completion.full.line.models.FullLineCompletionResult
+import org.jetbrains.completion.full.line.settings.MLServerCompletionBundle
 import java.net.ConnectException
 import java.net.SocketTimeoutException
 import java.util.concurrent.Callable
 import java.util.concurrent.ExecutionException
 
-class GPTCompletionProvider(private val host: String, private val port: Int) {
+class GPTCompletionProvider() {
     val description = "  gpt"
 
     fun getVariants(context: String, filename: String): List<String> {
@@ -54,6 +58,28 @@ class GPTCompletionProvider(private val host: String, private val port: Int) {
 
     companion object {
         private val LOG = Logger.getInstance(FullLineContributor::class.java)
+
+        private val host = Registry.get("ml.server.completion.host").asString()
+        private val port = Registry.get("ml.server.completion.port").asInteger()
+
+        fun getStatusCallback(): ActionCallback {
+            val callback = ActionCallback()
+            ApplicationManager.getApplication().executeOnPooledThread {
+                try {
+                    if (HttpRequests.request("http://$host:$port/v1/status").tryConnect() == 200) {
+                        callback.setDone()
+                    } else {
+                        callback.reject(MLServerCompletionBundle.message("ml.server.completion.gpt.connection.error"))
+                    }
+                } catch (e: SocketTimeoutException) {
+                    callback.reject(MLServerCompletionBundle.message("ml.server.completion.gpt.connection.timeout"))
+                } catch (e: Exception) {
+                    callback.reject(e.localizedMessage)
+                }
+
+            }
+            return callback
+        }
 
         //Completion server cancels all threads besides the last one
         //We need at least 2 threads, the second one must (almost) instantly cancel the first one, otherwise, UI will freeze

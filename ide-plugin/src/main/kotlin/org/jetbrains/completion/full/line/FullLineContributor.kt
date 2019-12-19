@@ -13,17 +13,14 @@ import org.jetbrains.completion.full.line.settings.MLServerCompletionSettings
 class FullLineContributor : CompletionContributor() {
     companion object {
         const val FULL_LINE_TAIL_TEXT = "full-line"
-        private val settings = MLServerCompletionSettings.getInstance()
+        private val settings = MLServerCompletionSettings.getInstance().state
 
         val LOG = Logger.getInstance(FullLineContributor::class.java)
 
         val INSERT_HANDLER = FullLineInsertHandler()
-
-        private val host = Registry.get("ml.server.completion.host").asString()
-        private val port = Registry.get("ml.server.completion.port").asInteger()
     }
 
-    private val provider = GPTCompletionProvider(host, port)
+    private val provider = GPTCompletionProvider()
 
     override fun fillCompletionVariants(parameters: CompletionParameters, result: CompletionResultSet) {
         if (!settings.enable)
