@@ -6,16 +6,15 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.ui.Messages
 import com.intellij.util.ui.UIUtil
+import org.jetbrains.completion.full.line.GPTCompletionProvider
 import org.jetbrains.completion.full.line.settings.MLServerCompletionBundle.Companion.message
-import org.jetbrains.completion.full.line.utils.MLServerUtils
 
 class ServerCompletionConfigurableProvider : ConfigurableProvider() {
     override fun createConfigurable(): Configurable? {
         val project = ProjectManager.getInstance().defaultProject
 
         return MLServerCompletionConfigurable {
-            println(MLServerCompletionSettings.getInstance())
-            MLServerUtils.getStatus().doWhenDone {
+            GPTCompletionProvider.getStatusCallback().doWhenDone {
                 showSuccessfulConnectionMessage(project)
             }.doWhenRejected { message ->
                 showConnectionFailedMessage(project, message)
