@@ -7,8 +7,9 @@ import com.intellij.ui.layout.toBinding
 import javax.swing.JTextField
 import kotlin.reflect.KMutableProperty0
 
-//TODO: remove later
-//For some reasons std intTextField method doesnt work, but it's copy works fine :/
+//For some reason method intTextField() in com/intellij/ui/layout/Cell.kt throws
+// java.lang.LinkageError: loader constraint violation: when resolving method,
+// But it's copy works fine :/
 fun Row.intTextFieldFixed(prop: KMutableProperty0<Int>, columns: Int? = null, range: IntRange? = null): CellBuilder<JTextField> {
     val binding = prop.toBinding()
     return textField(
