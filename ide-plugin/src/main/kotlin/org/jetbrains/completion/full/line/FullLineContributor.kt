@@ -19,17 +19,11 @@ class FullLineContributor : CompletionContributor() {
 
         val INSERT_HANDLER = FullLineInsertHandler()
 
-        private fun completionServerUrl(): String {
-            val url = Registry.get("ml.server.completion.host").asString()
-            val port = Registry.get("ml.server.completion.port").asInteger()
-            return "http://$url:$port"
-        }
+        private val host = Registry.get("ml.server.completion.host").asString()
+        private val port = Registry.get("ml.server.completion.port").asInteger()
     }
 
-    private val providers: List<FullLineCompletionProvider> = listOf(
-            NetworkCompletionProvider("gpt", "${completionServerUrl()}/v1/complete/gpt")
-            //NetworkCompletionProvider("char-rnn", "${completionServerUrl()}/v1/complete/charrnn")
-    )
+    private val provider = GPTCompletionProvider(host, port)
 
     override fun fillCompletionVariants(parameters: CompletionParameters, result: CompletionResultSet) {
         if (!settings.enable)
@@ -38,15 +32,13 @@ class FullLineContributor : CompletionContributor() {
         val context = parameters.originalFile.text.substring(0, parameters.offset)
         val filename = parameters.originalFile.name
 
-        for (provider in providers) {
-            for (variant in provider.getVariants(context, filename)) {
-                val lookupElementBuilder = LookupElementBuilder.create(variant)
-                        .withTailText("  ${provider.description}", true)
-                        .withTypeText(FULL_LINE_TAIL_TEXT)
-                        .withIcon(PythonIcons.Python.Python)
-                        .withInsertHandler(INSERT_HANDLER)
-                result.addElement(PrioritizedLookupElement.withPriority(lookupElementBuilder, 200000.0))
-            }
+        for (variant in provider.getVariants(context, filename)) {
+            val lookupElementBuilder = LookupElementBuilder.create(variant)
+                    .withTailText(provider.description, true)
+                    .withTypeText(FULL_LINE_TAIL_TEXT)
+                    .withIcon(PythonIcons.Python.Python)
+                    .withInsertHandler(INSERT_HANDLER)
+            result.addElement(PrioritizedLookupElement.withPriority(lookupElementBuilder, 200000.0))
         }
     }
 }
