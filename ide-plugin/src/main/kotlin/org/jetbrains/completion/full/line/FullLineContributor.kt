@@ -6,14 +6,13 @@ import com.intellij.codeInsight.completion.CompletionResultSet
 import com.intellij.codeInsight.completion.PrioritizedLookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.openapi.diagnostic.Logger
-import com.intellij.openapi.util.registry.Registry
 import icons.PythonIcons
 import org.jetbrains.completion.full.line.settings.MLServerCompletionSettings
 
 class FullLineContributor : CompletionContributor() {
     companion object {
         const val FULL_LINE_TAIL_TEXT = "full-line"
-        private val settings = MLServerCompletionSettings.getInstance().state
+        private val settings = MLServerCompletionSettings.getInstance()
 
         val LOG = Logger.getInstance(FullLineContributor::class.java)
 
@@ -23,7 +22,7 @@ class FullLineContributor : CompletionContributor() {
     private val provider = GPTCompletionProvider()
 
     override fun fillCompletionVariants(parameters: CompletionParameters, result: CompletionResultSet) {
-        if (!settings.enable)
+        if (!settings.isEnabled())
             return
 
         val context = parameters.originalFile.text.substring(0, parameters.offset)

@@ -8,23 +8,16 @@ import org.jetbrains.completion.full.line.models.FullLineCompletionMode
 
 @State(name = "MLServerCompletionSettings", storages = [Storage("MLServerCompletionSettings.xml")])
 class MLServerCompletionSettings : PersistentStateComponent<MLServerCompletionSettings.State> {
-    private val state = State()
+    private var state = State()
+
+    fun isEnabled() = state.enable
 
     override fun getState(): State {
         return state
     }
 
     override fun loadState(state: State) {
-        this.state.enable = state.enable
-        this.state.autoPopup = state.autoPopup
-        this.state.mode = state.mode
-
-        this.state.numIterations = state.numIterations
-        this.state.beamSize = state.beamSize
-        this.state.diversityGroups = state.diversityGroups
-        this.state.diversityStrength = state.diversityStrength
-        this.state.topN = state.topN
-        this.state.groupTopN = state.groupTopN
+        this.state = state
     }
 
     companion object {
@@ -33,17 +26,17 @@ class MLServerCompletionSettings : PersistentStateComponent<MLServerCompletionSe
         }
     }
 
-    class State {
-        // General Server ML Completion
-        var enable = true
-        var autoPopup = true
-        var mode = FullLineCompletionMode.FULL_LINE
-        // Beam search configuration
-        var numIterations = 10
-        var beamSize = 6
-        var diversityGroups = 5
-        var diversityStrength = 0.3
-        var topN = 5
-        var groupTopN = 5
-    }
+    data class State(
+            // General Server ML Completion
+            var enable: Boolean = true,
+            var autoPopup: Boolean = true,
+            var mode: FullLineCompletionMode = FullLineCompletionMode.FULL_LINE,
+            // Beam search configuration
+            var numIterations: Int = 10,
+            var beamSize: Int = 6,
+            var diversityGroups: Int = 5,
+            var diversityStrength: Double = 0.3,
+            var topN: Int = 5,
+            var groupTopN: Int = 5
+    )
 }
