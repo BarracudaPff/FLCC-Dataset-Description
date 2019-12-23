@@ -1,9 +1,9 @@
 package org.jetbrains.completion.full.line.settings
 
-import com.intellij.ui.layout.CellBuilder
-import com.intellij.ui.layout.ComponentPredicate
-import com.intellij.ui.layout.Row
-import com.intellij.ui.layout.toBinding
+import com.intellij.ui.components.Label
+import com.intellij.ui.layout.*
+import com.intellij.util.ui.AsyncProcessIcon
+import javax.swing.JLabel
 import javax.swing.JTextField
 import kotlin.reflect.KMutableProperty0
 
@@ -40,6 +40,21 @@ fun Row.doubleTextField(prop: KMutableProperty0<Double>, columns: Int? = null, r
             error("Please enter a number from ${range.first} to ${range.last}")
         else null
     }
+}
+
+fun Cell.loadingIcon(): CellBuilder<AsyncProcessIcon> {
+    val component = AsyncProcessIcon("Loading")
+    component.isVisible = false
+    component.suspend()
+
+    return component()
+}
+
+fun Cell.statusText(text: String): CellBuilder<JLabel> {
+    val component = Label(text, bold = true)
+    component.isVisible = false
+
+    return component()
 }
 
 fun Row.enableSubRowsIf(predicate: ComponentPredicate) {
