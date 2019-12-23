@@ -5,6 +5,7 @@ import com.intellij.openapi.options.SearchableConfigurable
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.util.ActionCallback
 import com.intellij.openapi.util.registry.Registry
+import com.intellij.ui.JBColor
 import com.intellij.ui.layout.*
 import com.intellij.util.ui.AsyncProcessIcon
 import org.jetbrains.completion.full.line.models.FullLineCompletionMode
@@ -82,10 +83,10 @@ class MLServerCompletionConfigurable(
 
         statusChecker().doWhenDone {
             statusText.text = "Successful"
-            statusText.foreground = Color.GREEN
+            statusText.foreground = JBColor(JBColor.GREEN.darker(), JBColor.GREEN.brighter())
         }.doWhenRejected(Runnable {
             statusText.text = "Invalid"
-            statusText.foreground = Color.RED
+            statusText.foreground = JBColor.RED
         }).doWhenProcessed {
             loadingIcon.suspend()
             loadingIcon.isVisible = false
