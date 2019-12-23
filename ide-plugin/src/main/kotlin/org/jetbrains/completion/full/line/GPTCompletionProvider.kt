@@ -1,7 +1,6 @@
 package org.jetbrains.completion.full.line
 
 import com.google.gson.Gson
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.progress.util.ProgressIndicatorUtils
 import com.intellij.openapi.util.ActionCallback
@@ -16,7 +15,7 @@ import java.net.SocketTimeoutException
 import java.util.concurrent.Callable
 import java.util.concurrent.ExecutionException
 
-class GPTCompletionProvider() {
+class GPTCompletionProvider {
     val description = "  gpt"
 
     fun getVariants(context: String, filename: String): List<String> {
@@ -64,7 +63,7 @@ class GPTCompletionProvider() {
 
         fun getStatusCallback(): ActionCallback {
             val callback = ActionCallback()
-            ApplicationManager.getApplication().executeOnPooledThread {
+            executor.submit {
                 try {
                     if (HttpRequests.request("http://$host:$port/v1/status").tryConnect() == 200) {
                         callback.setDone()
