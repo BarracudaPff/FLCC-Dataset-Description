@@ -23,7 +23,7 @@
         <registryKey key="ml.server.completion.host" defaultValue="34.210.4.157"
                      description="Full line completion server address"/>
 
-        <registryKey key="ml.server.completion.port" defaultValue="5001"
+        <registryKey key="ml.server.completion.port" defaultValue="5000"
                      description="Port for full line completion"/>
 
         <registryKey key="ml.server.completion.expand.settings" defaultValue="false"

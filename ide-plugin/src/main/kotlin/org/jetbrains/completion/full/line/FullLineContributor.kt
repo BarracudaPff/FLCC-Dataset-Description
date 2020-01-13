@@ -20,6 +20,16 @@ import org.jetbrains.completion.full.line.settings.MLServerCompletionSettings
 import javax.swing.Icon
 
 class FullLineContributor : CompletionContributor() {
+    companion object {
+        const val FULL_LINE_TAIL_TEXT = "full-line"
+        private val settings = MLServerCompletionSettings.getInstance()
+
+        val LOG = Logger.getInstance(FullLineContributor::class.java)
+
+        val INSERT_HANDLER = FullLineInsertHandler()
+    }
+
+    private val provider = GPTCompletionProvider()
     private val provider = GPTCompletionProvider(host, port)
     private val settings = MLServerCompletionSettings.getInstance()
     private val service: NextLevelFullLineCompletion = ServiceManager.getService(NextLevelFullLineCompletion::class.java)
@@ -28,6 +38,7 @@ class FullLineContributor : CompletionContributor() {
         if (!settings.enable
                 || (parameters.isAutoPopup && !settings.autoPopup)
                 || parameters.position.elementType == PyTokenTypes.END_OF_LINE_COMMENT)
+        if (!settings.isEnabled())
             return
 
         val supporter = LanguageMLSupporter.getInstance(parameters.originalFile.language) ?: return
