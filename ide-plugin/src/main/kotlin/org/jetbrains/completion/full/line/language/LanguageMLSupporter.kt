@@ -4,17 +4,17 @@ import com.intellij.codeInsight.template.impl.TemplateImpl
 import com.intellij.lang.Language
 
 interface LanguageMLSupporter {
-    fun isCorrect(variant: String): Boolean
-
     fun getFirstToken(line: String): String?
 
     fun getLastToken(line: String): String?
 
+    fun createStringTemplate(variant: String): TemplateImpl?
+
+    fun getMissingBraces(line: String): List<Char>?
+
     fun getPrefix(line: String): String {
         return getLastToken(line) ?: ""
     }
-
-    fun createTemplate(variant: String): TemplateImpl?
 
     companion object {
         fun getInstance(language: Language): LanguageMLSupporter? {
@@ -24,6 +24,4 @@ interface LanguageMLSupporter {
             }
         }
     }
-
-    fun getMissingBraces(line: String): List<Char>?
 }
