@@ -2,37 +2,9 @@ package org.jetbrains.completion.full.line.language
 
 import com.intellij.codeInsight.template.impl.TemplateImpl
 import com.intellij.codeInsight.template.impl.TextExpression
-import org.jetbrains.completion.full.line.settings.MLServerCompletionSettings
 import java.util.*
 
 class PythonSupporter : LanguageMLSupporter {
-    override fun isCorrect(variant: String): Boolean {
-        //temporary implementation
-        val f = variant.indexOf("#", 0, true)
-        if (f != -1) {
-            if (f != 0) {
-                return false
-            } else if (!MLServerCompletionSettings.getInstance().enableComments) {
-                return false
-            }
-        }
-
-        if (variant.last() == '_') {
-            return false
-        }
-
-        if (Regex("'").findAll(variant).count() % 2 != 0) {
-            return false
-        }
-
-        if (Regex("\"").findAll(variant).count() % 2 != 0) {
-            return false
-        }
-
-
-        return true
-    }
-
     override fun getFirstToken(line: String): String? {
         var curToken = ""
         var offset = 0
@@ -69,7 +41,7 @@ class PythonSupporter : LanguageMLSupporter {
         return null
     }
 
-    override fun createTemplate(variant: String): TemplateImpl? {
+    override fun createStringTemplate(variant: String): TemplateImpl? {
         val pair = prepareDataForTemplate(variant)
         if (pair.second.isEmpty()) {
             return null
@@ -124,18 +96,12 @@ class PythonSupporter : LanguageMLSupporter {
                 ')' to '(',
                 ']' to '[',
                 '}' to '{'
-                //,
-                //'\'' to '\'',
-                //'\"' to '\"'
         )
 
         private var OPEN_TO_CLOSE = hashMapOf(
                 '(' to ')',
                 '[' to ']',
                 '{' to '}'
-                //,
-                //'\'' to '\'',
-                //'\"' to '\"'
         )
 
         private var OPENERS = OPEN_TO_CLOSE.keys
