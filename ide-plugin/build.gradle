@@ -7,7 +7,7 @@ plugins {
 }
 
 group 'org.jetbrains.completion.full.line'
-version '0.0.5'
+version '0.0.4'
 
 sourceCompatibility = 1.8
 
@@ -37,6 +37,13 @@ patchPluginXml {
     untilBuild '201.*'
 
     changeNotes """
+        0.0.4 <br>
+        <ul>
+            <li>Add Template-like string walking</li>
+            <li>Start removing overwriting chars</li>
+            <li>Add options for strings walking, enabling comments, completing only full lines</li>
+            <li>Adjust missing braces</li>
+        </ul>
         0.0.3 <br>
         <ul>
             <li>Add Settings for better UX. Settings -> Editor -> General -> Code Completion -> Server ML Completion</li>
