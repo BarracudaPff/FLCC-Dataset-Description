@@ -1,18 +1,14 @@
 package org.jetbrains.completion.full.line
 
 import com.google.gson.Gson
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.progress.util.ProgressIndicatorUtils
 import com.intellij.openapi.util.ActionCallback
 import com.intellij.openapi.util.registry.Registry
 import com.intellij.util.concurrency.AppExecutorUtil
-import com.intellij.openapi.util.ActionCallback
-import com.intellij.util.concurrency.SequentialTaskExecutor
 import com.intellij.util.io.HttpRequests
 import org.jetbrains.completion.full.line.models.FullLineCompletionRequest
 import org.jetbrains.completion.full.line.models.FullLineCompletionResult
-import org.jetbrains.completion.full.line.settings.MLServerCompletionBundle
 import org.jetbrains.completion.full.line.settings.MLServerCompletionBundle
 import org.jetbrains.completion.full.line.settings.MLServerCompletionSettings
 import java.net.ConnectException
@@ -23,20 +19,20 @@ import java.util.concurrent.ExecutionException
 class GPTCompletionProvider {
     val description = "  gpt"
 
-    fun getVariants(context: String, filename: String, prefix: String): List<String> {
+    fun getVariants(context: String, filename: String, prefix: String, offset: Int): List<String> {
         val start = System.currentTimeMillis()
         val future = executor.submit(Callable<List<String>> {
             try {
                 HttpRequests.post("http://$host:$port/v1/complete/gpt", "application/json")
                         .connect { r ->
                             val request = FullLineCompletionRequest(
-                                                context,
-                                                prefix,
-                                                context.length-prefix.length,
-                                                filename,
-                                                MLServerCompletionSettings.getInstance())
+                                    context,
+                                    prefix,
+                                    offset,
+                                    filename,
+                                    MLServerCompletionSettings.getInstance())
 
-                                        r.write(Gson().toJson(request))
+                            r.write(Gson().toJson(request))
 
                             Gson().fromJson(r.reader, FullLineCompletionResult::class.java).completions
                         }
