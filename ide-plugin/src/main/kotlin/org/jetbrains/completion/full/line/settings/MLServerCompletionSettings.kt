@@ -12,6 +12,12 @@ class MLServerCompletionSettings : PersistentStateComponent<MLServerCompletionSe
 
     fun isEnabled() = state.enable
 
+    fun enableStringsWalking() = state.autoPopup
+
+    fun enableComments() = state.autoPopup
+
+    fun isAutoPopup() = state.autoPopup
+
     override fun getState(): State {
         return state
     }
@@ -30,6 +36,10 @@ class MLServerCompletionSettings : PersistentStateComponent<MLServerCompletionSe
             // General Server ML Completion
             var enable: Boolean = true,
             var autoPopup: Boolean = true,
+            var stringsWalking: Boolean = true,
+            var enableComments: Boolean = false,
+            var onlyFullLines: Boolean = true,
+
             var mode: FullLineCompletionMode = FullLineCompletionMode.FULL_LINE,
             // Beam search configuration
             var numIterations: Int = 10,

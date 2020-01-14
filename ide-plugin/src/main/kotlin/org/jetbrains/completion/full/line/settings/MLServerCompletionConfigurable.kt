@@ -46,6 +46,19 @@ class MLServerCompletionConfigurable(
                     row {
                         checkBox(message("ml.server.completion.autoPopup"), settings::autoPopup)
                     }
+
+                    row {
+                        checkBox(message("ml.server.completion.enable.strings.walking"), settings::stringsWalking)
+                    }
+
+                    row {
+                        checkBox(message("ml.server.completion.enable.comments"), settings::enableComments)
+                    }
+
+                    row {
+                        checkBox(message("ml.server.completion.only.full"), settings::onlyFullLines)
+                    }
+
                     row {
                         val use = checkBox(message("ml.server.completion.top.n.use")).selected
                         row { intTextFieldFixed(settings::topN, 1, IntRange(0, 100)) }.enableIf(use)
