@@ -8,13 +8,8 @@ data class FullLineCompletionRequest(
         val token: String,
         val offset: Int,
         val filename: String,
-        @SerializedName("branches")
-        val suggestions: Int,
-        val tokens: Int,
 
         val mode: FullLineCompletionMode,
-        @SerializedName("generator")
-        val algorithm: FullLineCompletionAlgorithm,
 
         @SerializedName("num_iterations")
         val numIterations: Int,
@@ -25,8 +20,6 @@ data class FullLineCompletionRequest(
         @SerializedName("diversity_strength")
         val diversityStrength: Double,
 
-        @SerializedName("use_top_n")
-        val useTopN: Boolean,
         @SerializedName("top_n")
         val topN: Int,
         @SerializedName("only_full_lines")
@@ -37,17 +30,13 @@ data class FullLineCompletionRequest(
             prefix,
             offset,
             filename,
-            suggestions = settings.suggestions,
-            tokens = settings.tokens,
-            mode = settings.mode,
-            algorithm = settings.algorithm,
-            numIterations = settings.numIterations,
-            beamSize = settings.beamSize,
-            diversityGroups = settings.diversityGroups,
-            diversityStrength = settings.diversityStrength,
-            useTopN = settings.useTopN,
-            topN = settings.topN,
-            onlyFullLines = settings.onlyFullLines
+            settings.state.mode,
+            settings.state.numIterations,
+            settings.state.beamSize,
+            settings.state.diversityGroups,
+            settings.state.diversityStrength,
+            settings.state.topN,
+            settings.state.onlyFullLines
     )
 }
 
