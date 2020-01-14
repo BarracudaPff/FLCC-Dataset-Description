@@ -1,4 +1,4 @@
-package org.jetbrains.completion.full.line.handlers
+package org.jetbrains.completion.full.line
 
 import com.intellij.codeInsight.completion.InsertHandler
 import com.intellij.codeInsight.completion.InsertionContext
@@ -9,14 +9,13 @@ import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.util.TextRange
 import com.intellij.openapi.util.text.StringUtil
 import org.jetbrains.completion.full.line.language.LanguageMLSupporter
-import org.jetbrains.completion.full.line.language.PythonSupporter
 import org.jetbrains.completion.full.line.services.NextLevelFullLineCompletion
+import org.jetbrains.completion.full.line.settings.MLServerCompletionSettings
 
 class FullLineInsertHandler(private val supporter: LanguageMLSupporter) : InsertHandler<LookupElement> {
     private val nextLevelService: NextLevelFullLineCompletion = ServiceManager.getService(NextLevelFullLineCompletion::class.java)
 
     override fun handleInsert(context: InsertionContext, item: LookupElement) {
-
         ApplicationManager.getApplication().runWriteAction {
             val ans = item.lookupString
             val document = context.document
@@ -47,31 +46,35 @@ class FullLineInsertHandler(private val supporter: LanguageMLSupporter) : Insert
                     return@let it.length
                 } ?: 0
 
-                val newText = document.getText(TextRange(startCompletion, offset + missingBracesAmount))
 
-                val template = supporter.createTemplate(newText) ?: return@runWriteAction
-                LiveTemplateLookupElementImpl.startTemplate(context, template)
+                if (MLServerCompletionSettings.getInstance().enableStringsWalking()) {
+                    val newText = document.getText(TextRange(startCompletion, offset + missingBracesAmount))
+                    val template = supporter.createStringTemplate(newText) ?: return@runWriteAction
+                    LiveTemplateLookupElementImpl.startTemplate(context, template)
+                }
             }
         }
     }
 
-    fun removeOverwritingChars(completion: String, line: String): Int {
-        var remove = 0
-        for (ch in line) {
+    private fun removeOverwritingChars(completion: String, line: String): Int {
+        var amount = 0
+
+        for (char in line) {
             var found = false
-            for (chC in completion.drop(remove)) {
-                if (chC == ch) {
+
+            for (charWithOffset in completion.drop(amount)) {
+                if (charWithOffset == char) {
                     found = true
                     break
                 }
             }
-            if (!found) {
-                break
+            if (found) {
+                amount++
             } else {
-                remove++
+                break
             }
         }
 
-        return remove
+        return amount
     }
 }
