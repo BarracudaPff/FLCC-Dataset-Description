@@ -159,6 +159,12 @@ Full dataset slitted by parts
 | 1 | [link](https://5k-dataset.s3.amazonaws.com/v3/dataset-open-50-less-1.tar.gz) | 101.6 GB|  >500 GB | ?  | ? |
 | 2 | [link](https://5k-dataset.s3.amazonaws.com/v3/dataset-open-50-less-2.tar.gz) | 111.9 GB |  >500 GB | ?  | ? |
 
+**Top 5000 Fixed Repositories (3490 Python), more than 50 stars**
+
+| Part |Link | Compressed size | Full size | Amount of files | Amount of repositories |
+| ---- |---- | --------------- | --------- | --------------- | ---------------------- |
+| With Imports    | [link](https://5k-dataset.s3.amazonaws.com/v3/dataset-normalized-5000-with-imports.tar.gz)    | 482 MB | ? | ? | ? |
+| Without Imports | [link](https://5k-dataset.s3.amazonaws.com/v3/dataset-normalized-5000-without-imports.tar.gz) | 470 MB | ? | ? | ? |
 
 &nbsp;
 ## Extra
