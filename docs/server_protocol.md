@@ -1,6 +1,11 @@
 # API Protocol
 
-Simple api protocol for Full Line Code Completion 
+Simple api protocol for Full Line Code Completion
+- [Server status](#server-status)
+- [List of languages](#list-of-languages)
+- [Complete code](#complete-code) 
+    - [Parameters](#parameters)
+    - [Request](#request)
 
 ### Server status
 #### GET `/v1/status`
