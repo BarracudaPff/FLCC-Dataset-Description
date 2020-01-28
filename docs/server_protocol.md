@@ -1,8 +1,7 @@
-### API Protocol
+# API Protocol
 
-## Server status
-
-### GET `/v1/status`
+### Server status
+#### GET `/v1/status`
 Check server status
 
 **Response:**
@@ -16,8 +15,8 @@ Check server status
 1. 500 (If exception pop up)
 
 ##
-
-### GET `/v1/languages`
+### List of languages
+#### GET `/v1/languages`
 **Successful Response**
 Get list of all supported languages
 
@@ -48,7 +47,8 @@ Get list of all supported languages
 
 ##
 
-### POST `/v1/complete?language=LANGUAGE`
+### Complete code
+#### POST `/v1/complete?language=LANGUAGE`
 Get completions based on current model, settings and code
 
 #### Parameters
