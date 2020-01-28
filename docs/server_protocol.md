@@ -1,5 +1,7 @@
 # API Protocol
 
+Simple api protocol for Full Line Code Completion 
+
 ### Server status
 #### GET `/v1/status`
 Check server status
