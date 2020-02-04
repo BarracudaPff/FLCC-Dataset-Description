@@ -5,29 +5,30 @@ import com.intellij.codeInsight.completion.CompletionParameters
 import com.intellij.codeInsight.completion.CompletionResultSet
 import com.intellij.codeInsight.completion.PrioritizedLookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
-import com.intellij.openapi.components.ServiceManager
-import com.intellij.psi.util.elementType
-import com.jetbrains.python.PyTokenTypes
+import com.intellij.openapi.components.service
 import icons.PythonIcons
 import org.jetbrains.completion.full.line.language.LanguageMLSupporter
 import org.jetbrains.completion.full.line.models.FullLineCompletionMode
 import org.jetbrains.completion.full.line.services.NextLevelFullLineCompletion
 import org.jetbrains.completion.full.line.settings.MLServerCompletionSettings
 import javax.swing.Icon
+import javax.swing.plaf.metal.MetalCheckBoxIcon
 
 class FullLineContributor : CompletionContributor() {
     private val provider = GPTCompletionProvider()
     private val settings = MLServerCompletionSettings.getInstance()
-    private val service: NextLevelFullLineCompletion = ServiceManager.getService(NextLevelFullLineCompletion::class.java)
+    private val service: NextLevelFullLineCompletion = service()
 
     override fun fillCompletionVariants(parameters: CompletionParameters, result: CompletionResultSet) {
-        if (!settings.isEnabled()
-                || (parameters.isAutoPopup && !settings.isAutoPopup())
-                || (parameters.position.elementType == PyTokenTypes.END_OF_LINE_COMMENT) && settings.enableComments())
+        val t1 = System.currentTimeMillis()
+        if (!settings.isEnabled() || (parameters.isAutoPopup && !settings.isAutoPopup()))
             return
 
         val supporter = LanguageMLSupporter.getInstance(parameters.originalFile.language) ?: return
 
+        if (!settings.isCommentsEnabled() && supporter.isComment(parameters.position)) {
+            return
+        }
         handleFirstLine(result, supporter)
 
         val context = parameters.originalFile.text
@@ -36,10 +37,19 @@ class FullLineContributor : CompletionContributor() {
 
         val prefix = supporter.getPrefix(context.substring(0, parameters.offset))
 
-        for (variant in provider.getVariants(context, filename, prefix, offset)) {
+        var variants = provider.getVariants(context, filename, prefix, offset)
+
+        println(variants)
+
+        for (variant in variants) {
             val element = getLookupElementBuilder(supporter, variant) ?: continue
             result.addElement(PrioritizedLookupElement.withPriority(element, 100000.0))
         }
+
+        println("Time to complete: ${(System.currentTimeMillis() - t1)/1000.0}")
+
+//        val element3 = getLookupElementBuilder(supporter, "response = requests.get('data') ")?.withIcon(MetalCheckBoxIcon())
+//        result.addElement(PrioritizedLookupElement.withPriority(element3, 50000.0))
     }
 
     private fun handleFirstLine(result: CompletionResultSet, supporter: LanguageMLSupporter) {

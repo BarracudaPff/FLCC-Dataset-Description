@@ -12,9 +12,12 @@ class MLServerCompletionSettings : PersistentStateComponent<MLServerCompletionSe
 
     fun isEnabled() = state.enable
 
-    fun enableStringsWalking() = state.autoPopup
+    /**
+    Enabling walking
+     */
+    fun enableStringsWalking() = state.stringsWalking
 
-    fun enableComments() = state.autoPopup
+    fun isCommentsEnabled() = state.enableComments
 
     fun isAutoPopup() = state.autoPopup
 
@@ -41,12 +44,17 @@ class MLServerCompletionSettings : PersistentStateComponent<MLServerCompletionSe
             var onlyFullLines: Boolean = true,
 
             var mode: FullLineCompletionMode = FullLineCompletionMode.FULL_LINE,
+
             // Beam search configuration
             var numIterations: Int = 10,
             var beamSize: Int = 6,
             var diversityGroups: Int = 5,
             var diversityStrength: Double = 0.3,
+
+            var useTopN: Boolean = false,
+            var useGroupTopN: Boolean = false,
             var topN: Int = 5,
-            var groupTopN: Int = 5
+            var groupTopN: Int = 5,
+            var model: String = "best"
     )
 }

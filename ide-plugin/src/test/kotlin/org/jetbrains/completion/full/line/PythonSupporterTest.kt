@@ -17,12 +17,12 @@ class PythonSupporterTest {
         assertEquals(expectedToken, supporter.getFirstToken(line))
     }
 
-    @ParameterizedTest
-    @MethodSource("lastTokenData")
-    fun `test last token`(line: String, expectedToken: String?) {
-        val supporter = PythonSupporter()
-        assertEquals(expectedToken, supporter.getLastToken(line))
-    }
+//    @ParameterizedTest
+//    @MethodSource("lastTokenData")
+//    fun `test last token`(line: String, expectedToken: String?) {
+//        val supporter = PythonSupporter()
+//        assertEquals(expectedToken, supporter.getLastToken(line))
+//    }
 
     @ParameterizedTest
     @MethodSource("getMatchesData")
@@ -33,12 +33,12 @@ class PythonSupporterTest {
         assertEquals(values, matches.second)
     }
 
-    @ParameterizedTest
-    @MethodSource("lastTokenData")
-    fun `test missing braces`(line: String, expectedToken: String?) {
-        val supporter = PythonSupporter()
-        assertEquals(expectedToken, supporter.getLastToken(line))
-    }
+//    @ParameterizedTest
+//    @MethodSource("lastTokenData")
+//    fun `test missing braces`(line: String, expectedToken: String?) {
+//        val supporter = PythonSupporter()
+//        assertEquals(expectedToken, supporter.getLastToken(line))
+//    }
 
     @Suppress("unused")
     companion object {

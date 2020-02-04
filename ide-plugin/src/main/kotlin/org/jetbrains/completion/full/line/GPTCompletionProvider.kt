@@ -9,12 +9,15 @@ import com.intellij.util.concurrency.AppExecutorUtil
 import com.intellij.util.io.HttpRequests
 import org.jetbrains.completion.full.line.models.FullLineCompletionRequest
 import org.jetbrains.completion.full.line.models.FullLineCompletionResult
+import org.jetbrains.completion.full.line.models.FullLineCompletionStatus
 import org.jetbrains.completion.full.line.settings.MLServerCompletionBundle
 import org.jetbrains.completion.full.line.settings.MLServerCompletionSettings
 import java.net.ConnectException
+import java.net.HttpURLConnection
 import java.net.SocketTimeoutException
 import java.util.concurrent.Callable
 import java.util.concurrent.ExecutionException
+import java.util.concurrent.TimeUnit
 
 class GPTCompletionProvider {
     val description = "  gpt"
@@ -38,11 +41,11 @@ class GPTCompletionProvider {
                         }
             } catch (e: Exception) {
                 val message = when (e) {
-                    is ConnectException                             -> return@Callable emptyList()
-                    is SocketTimeoutException                       -> "Timeout. Probably IP is wrong"
-                    is HttpRequests.HttpStatusException             -> "Something wrong with completion server"
+                    is ConnectException -> return@Callable emptyList()
+                    is SocketTimeoutException -> "Timeout. Probably IP is wrong"
+                    is HttpRequests.HttpStatusException -> "Something wrong with completion server"
                     is ExecutionException, is IllegalStateException -> "Error while getting completions from server"
-                    else                                            -> "Some other error occurred"
+                    else -> "Some other error occurred"
                 }
                 logError(message, e)
             }
@@ -51,7 +54,7 @@ class GPTCompletionProvider {
         ProgressIndicatorUtils.awaitWithCheckCanceled(future)
 
         LOG.debug("Time to predict completions is ${(System.currentTimeMillis() - start) / 1000.0}")
-        return future.get()
+        return future.get(5, TimeUnit.SECONDS)
     }
 
     private fun logError(msg: String, error: Exception): List<String> {
@@ -64,6 +67,27 @@ class GPTCompletionProvider {
 
         private val host = Registry.get("ml.server.completion.host").asString()
         private val port = Registry.get("ml.server.completion.port").asInteger()
+
+        fun getModels(): List<String> {
+            val future = executor.submit(Callable<List<String>> {
+                try {
+                    HttpRequests.request("http://$host:$port/v1/status").connect { r ->
+                        val res = Gson().fromJson(r.reader, FullLineCompletionStatus::class.java)
+
+                        println("res")
+                        println(res)
+
+                        res.models.toList()
+                    }
+                } catch (e: Exception) {
+                    return@Callable emptyList()
+                }
+            })
+
+//            ProgressIndicatorUtils.awaitWithCheckCanceled(future)
+
+            return listOf("best") + future.get()
+        }
 
         fun getStatusCallback(): ActionCallback {
             val callback = ActionCallback()

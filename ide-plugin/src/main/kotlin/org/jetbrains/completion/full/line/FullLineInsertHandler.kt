@@ -8,6 +8,9 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.util.TextRange
 import com.intellij.openapi.util.text.StringUtil
+import com.intellij.psi.SyntaxTraverser
+import com.jetbrains.python.codeInsight.imports.PythonImportUtils
+import com.jetbrains.python.psi.PyElement
 import org.jetbrains.completion.full.line.language.LanguageMLSupporter
 import org.jetbrains.completion.full.line.services.NextLevelFullLineCompletion
 import org.jetbrains.completion.full.line.settings.MLServerCompletionSettings
@@ -49,10 +52,27 @@ class FullLineInsertHandler(private val supporter: LanguageMLSupporter) : Insert
 
                 if (MLServerCompletionSettings.getInstance().enableStringsWalking()) {
                     val newText = document.getText(TextRange(startCompletion, offset + missingBracesAmount))
-                    val template = supporter.createStringTemplate(newText) ?: return@runWriteAction
+                    val template = supporter.createStringTemplate(newText)
+                            ?: return@runWriteAction
+//                    val template = supporter.createStringTemplate(context.file, startCompletion, offset + missingBracesAmount)
+//                            ?: return@runWriteAction
                     LiveTemplateLookupElementImpl.startTemplate(context, template)
                 }
             }
+        }
+
+        ApplicationManager.getApplication().runWriteAction {
+            SyntaxTraverser.psiTraverser()
+                    .withRoot(context.file)
+                    .onRange(TextRange(context.startOffset, context.selectionEndOffset))
+                    .filter { it.firstChild == null && !it.text.isBlank() }
+                    .forEach lit@{
+                        val ref = context.file.findReferenceAt(it.textOffset)
+                        val el = ref?.element ?: return@lit
+                        if (el is PyElement) {
+                            PythonImportUtils.proposeImportFix(el, ref)?.applyFix()
+                        }
+                    }
         }
     }
 
