@@ -14,7 +14,10 @@ Check server status
 **Response:**
 ```json
 {
-  "status": true
+  "status": true,
+  "models_GPT": [
+    "model0",
+  ],
 }
 ```
 **Returns:**
