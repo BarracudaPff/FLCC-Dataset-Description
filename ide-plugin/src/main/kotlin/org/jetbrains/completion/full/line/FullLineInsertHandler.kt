@@ -41,15 +41,23 @@ class FullLineInsertHandler(private val supporter: LanguageMLSupporter) : Insert
 
                 document.deleteString(offset, offset + remove)
 
-                val missingBracesAmount = supporter.getMissingBraces(ans)?.joinToString()?.let { it ->
-                    document.insertString(offset, it)
-                    return@let it.length
-                } ?: 0
-
+                val missingBracesAmount = supporter.getMissingBraces(ans)
+                        ?.joinToString()
+                        ?.let { it ->
+                            document.insertString(offset, it)
+                            it.length
+                        } ?: 0
 
                 if (MLServerCompletionSettings.getInstance().enableStringsWalking()) {
-                    val newText = document.getText(TextRange(startCompletion, offset + missingBracesAmount))
-                    val template = supporter.createStringTemplate(newText) ?: return@runWriteAction
+                    val fixedStart = context.file
+                            .findElementAt(startCompletion)
+                            ?.textRange
+                            ?.startOffset
+                            ?.apply { document.deleteString(this, startCompletion) }
+                            ?: startCompletion
+
+                    val template = supporter.createStringTemplate(context.file, fixedStart, offset + missingBracesAmount)
+                            ?: return@runWriteAction
                     LiveTemplateLookupElementImpl.startTemplate(context, template)
                 }
             }
@@ -63,7 +71,7 @@ class FullLineInsertHandler(private val supporter: LanguageMLSupporter) : Insert
             var found = false
 
             for (charWithOffset in completion.drop(amount)) {
-                if (charWithOffset == char) {
+                if (!charWithOffset.isLetterOrWhitespace() && charWithOffset == char) {
                     found = true
                     break
                 }
