@@ -1,9 +1,6 @@
 package org.jetbrains.completion.full.line.settings
 
-import com.intellij.openapi.components.PersistentStateComponent
-import com.intellij.openapi.components.ServiceManager
-import com.intellij.openapi.components.State
-import com.intellij.openapi.components.Storage
+import com.intellij.openapi.components.*
 import org.jetbrains.completion.full.line.models.FullLineCompletionMode
 
 @State(name = "MLServerCompletionSettings", storages = [Storage("MLServerCompletionSettings.xml")])
@@ -13,12 +10,14 @@ class MLServerCompletionSettings : PersistentStateComponent<MLServerCompletionSe
     fun isEnabled() = state.enable
 
     /**
-    Enabling walking
+     * Checks if template-like walking on string enabled.
+     * It works just like Live Templates in IDEA
      */
     fun enableStringsWalking() = state.stringsWalking
 
-    fun isCommentsEnabled() = state.enableComments
-
+    /**
+     * Checks if completion can be called during auto popup
+     */
     fun isAutoPopup() = state.autoPopup
 
     override fun getState(): State {
@@ -31,7 +30,7 @@ class MLServerCompletionSettings : PersistentStateComponent<MLServerCompletionSe
 
     companion object {
         fun getInstance(): MLServerCompletionSettings {
-            return ServiceManager.getService(MLServerCompletionSettings::class.java)
+            return service()
         }
     }
 
@@ -40,21 +39,19 @@ class MLServerCompletionSettings : PersistentStateComponent<MLServerCompletionSe
             var enable: Boolean = true,
             var autoPopup: Boolean = true,
             var stringsWalking: Boolean = true,
-            var enableComments: Boolean = false,
             var onlyFullLines: Boolean = true,
 
             var mode: FullLineCompletionMode = FullLineCompletionMode.FULL_LINE,
-
             // Beam search configuration
             var numIterations: Int = 10,
             var beamSize: Int = 6,
             var diversityGroups: Int = 5,
             var diversityStrength: Double = 0.3,
-
-            var useTopN: Boolean = false,
-            var useGroupTopN: Boolean = false,
             var topN: Int = 5,
             var groupTopN: Int = 5,
-            var model: String = "best"
+
+            //Additional setting for correct usage
+            var useTopN: Boolean = false,
+            var useGroupTopN: Boolean = false
     )
 }

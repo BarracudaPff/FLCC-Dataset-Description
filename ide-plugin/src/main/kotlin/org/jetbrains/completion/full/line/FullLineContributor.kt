@@ -1,9 +1,6 @@
 package org.jetbrains.completion.full.line
 
-import com.intellij.codeInsight.completion.CompletionContributor
-import com.intellij.codeInsight.completion.CompletionParameters
-import com.intellij.codeInsight.completion.CompletionResultSet
-import com.intellij.codeInsight.completion.PrioritizedLookupElement
+import com.intellij.codeInsight.completion.*
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.openapi.components.service
 import icons.PythonIcons
@@ -12,7 +9,6 @@ import org.jetbrains.completion.full.line.models.FullLineCompletionMode
 import org.jetbrains.completion.full.line.services.NextLevelFullLineCompletion
 import org.jetbrains.completion.full.line.settings.MLServerCompletionSettings
 import javax.swing.Icon
-import javax.swing.plaf.metal.MetalCheckBoxIcon
 
 class FullLineContributor : CompletionContributor() {
     private val provider = GPTCompletionProvider()
@@ -20,36 +16,26 @@ class FullLineContributor : CompletionContributor() {
     private val service: NextLevelFullLineCompletion = service()
 
     override fun fillCompletionVariants(parameters: CompletionParameters, result: CompletionResultSet) {
-        val t1 = System.currentTimeMillis()
         if (!settings.isEnabled() || (parameters.isAutoPopup && !settings.isAutoPopup()))
             return
 
         val supporter = LanguageMLSupporter.getInstance(parameters.originalFile.language) ?: return
 
-        if (!settings.isCommentsEnabled() && supporter.isComment(parameters.position)) {
+        if (supporter.isComment(parameters.position)) {
             return
         }
+
         handleFirstLine(result, supporter)
 
         val context = parameters.originalFile.text
         val filename = parameters.originalFile.name
         val offset = parameters.offset
+        val prefix = CompletionUtil.findAlphanumericPrefix(parameters)
 
-        val prefix = supporter.getPrefix(context.substring(0, parameters.offset))
-
-        var variants = provider.getVariants(context, filename, prefix, offset)
-
-        println(variants)
-
-        for (variant in variants) {
+        for (variant in provider.getVariants(context, filename, prefix, offset)) {
             val element = getLookupElementBuilder(supporter, variant) ?: continue
             result.addElement(PrioritizedLookupElement.withPriority(element, 100000.0))
         }
-
-        println("Time to complete: ${(System.currentTimeMillis() - t1)/1000.0}")
-
-//        val element3 = getLookupElementBuilder(supporter, "response = requests.get('data') ")?.withIcon(MetalCheckBoxIcon())
-//        result.addElement(PrioritizedLookupElement.withPriority(element3, 50000.0))
     }
 
     private fun handleFirstLine(result: CompletionResultSet, supporter: LanguageMLSupporter) {

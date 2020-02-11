@@ -11,7 +11,6 @@ import com.intellij.util.ui.AsyncProcessIcon
 import org.jetbrains.completion.full.line.models.FullLineCompletionMode
 import org.jetbrains.completion.full.line.settings.MLServerCompletionBundle.Companion.message
 import java.awt.Color
-import javax.swing.DefaultComboBoxModel
 import javax.swing.JLabel
 
 class MLServerCompletionConfigurable(
@@ -53,10 +52,6 @@ class MLServerCompletionConfigurable(
                     }
 
                     row {
-                        checkBox(message("ml.server.completion.enable.comments"), settings::enableComments)
-                    }
-
-                    row {
                         checkBox(message("ml.server.completion.only.full"), settings::onlyFullLines)
                     }
 
@@ -66,34 +61,30 @@ class MLServerCompletionConfigurable(
                     }
 
                     if (Registry.get("ml.server.completion.expand.settings").asBoolean()) {
-                        row {
-
-                            cell {
-                                label("Completion model: ")
-                                comboBox(DefaultComboBoxModel(arrayOf("best", "checkpoint0", "checkpoint1")), settings::model)
-                            }
-                        }
-
-                        row(message("ml.server.completion.bs")) {
-                            row(message("ml.server.completion.bs.num.iterations")) {
-                                intTextFieldFixed(settings::numIterations, 1, IntRange(0, 50))
-                            }
-                            row(message("ml.server.completion.bs.beam.size")) {
-                                intTextFieldFixed(settings::beamSize, 1, IntRange(0, 20))
-                            }
-                            row(message("ml.server.completion.bs.diversity.strength")) {
-                                doubleTextField(settings::diversityStrength, 1, IntRange(0, 1))
-                            }
-                            row(message("ml.server.completion.bs.diversity.groups")) {
-                                intTextFieldFixed(settings::diversityGroups, 1, IntRange(0, 10))
-                                row {
-                                    val groupUse = checkBox(message("ml.server.completion.group.top.n.use"), settings::useGroupTopN).selected
-                                    row { intTextFieldFixed(settings::groupTopN, 1, IntRange(0, 100)) }.enableIf(groupUse)
-                                }
-                            }
-                        }
+                        expandedSettingsPanel()
                     }
                 }.enableSubRowsIf(gpt)
+            }
+        }
+    }
+
+    private fun Row.expandedSettingsPanel() {
+        row(message("ml.server.completion.bs")) {
+            row(message("ml.server.completion.bs.num.iterations")) {
+                intTextFieldFixed(settings::numIterations, 1, IntRange(0, 50))
+            }
+            row(message("ml.server.completion.bs.beam.size")) {
+                intTextFieldFixed(settings::beamSize, 1, IntRange(0, 20))
+            }
+            row(message("ml.server.completion.bs.diversity.strength")) {
+                doubleTextField(settings::diversityStrength, 1, IntRange(0, 1))
+            }
+            row(message("ml.server.completion.bs.diversity.groups")) {
+                intTextFieldFixed(settings::diversityGroups, 1, IntRange(0, 10))
+                row {
+                    val groupUse = checkBox(message("ml.server.completion.group.top.n.use"), settings::useGroupTopN).selected
+                    row { intTextFieldFixed(settings::groupTopN, 1, IntRange(0, 10)) }.enableIf(groupUse)
+                }
             }
         }
     }
