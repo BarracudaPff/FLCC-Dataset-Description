@@ -1,13 +1,8 @@
 package org.jetbrains.completion.full.line
 
-import com.intellij.codeInsight.completion.CompletionContributor
-import com.intellij.codeInsight.completion.CompletionParameters
-import com.intellij.codeInsight.completion.CompletionResultSet
-import com.intellij.codeInsight.completion.PrioritizedLookupElement
+import com.intellij.codeInsight.completion.*
 import com.intellij.codeInsight.lookup.LookupElementBuilder
-import com.intellij.openapi.components.ServiceManager
-import com.intellij.psi.util.elementType
-import com.jetbrains.python.PyTokenTypes
+import com.intellij.openapi.components.service
 import icons.PythonIcons
 import org.jetbrains.completion.full.line.language.LanguageMLSupporter
 import org.jetbrains.completion.full.line.models.FullLineCompletionMode
@@ -18,23 +13,24 @@ import javax.swing.Icon
 class FullLineContributor : CompletionContributor() {
     private val provider = GPTCompletionProvider()
     private val settings = MLServerCompletionSettings.getInstance()
-    private val service: NextLevelFullLineCompletion = ServiceManager.getService(NextLevelFullLineCompletion::class.java)
+    private val service: NextLevelFullLineCompletion = service()
 
     override fun fillCompletionVariants(parameters: CompletionParameters, result: CompletionResultSet) {
-        if (!settings.isEnabled()
-                || (parameters.isAutoPopup && !settings.isAutoPopup())
-                || (parameters.position.elementType == PyTokenTypes.END_OF_LINE_COMMENT) && settings.enableComments())
+        if (!settings.isEnabled() || (parameters.isAutoPopup && !settings.isAutoPopup()))
             return
 
         val supporter = LanguageMLSupporter.getInstance(parameters.originalFile.language) ?: return
+
+        if (supporter.isComment(parameters.position)) {
+            return
+        }
 
         handleFirstLine(result, supporter)
 
         val context = parameters.originalFile.text
         val filename = parameters.originalFile.name
         val offset = parameters.offset
-
-        val prefix = supporter.getPrefix(context.substring(0, parameters.offset))
+        val prefix = CompletionUtil.findAlphanumericPrefix(parameters)
 
         for (variant in provider.getVariants(context, filename, prefix, offset)) {
             val element = getLookupElementBuilder(supporter, variant) ?: continue
