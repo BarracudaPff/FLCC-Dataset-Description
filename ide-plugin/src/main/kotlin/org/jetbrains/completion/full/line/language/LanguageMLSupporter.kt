@@ -1,20 +1,18 @@
 package org.jetbrains.completion.full.line.language
 
-import com.intellij.codeInsight.template.impl.TemplateImpl
+import com.intellij.codeInsight.template.Template
 import com.intellij.lang.Language
+import com.intellij.psi.PsiComment
+import com.intellij.psi.PsiElement
 
 interface LanguageMLSupporter {
+    fun isComment(element: PsiElement): Boolean = element is PsiComment
+
     fun getFirstToken(line: String): String?
 
-    fun getLastToken(line: String): String?
-
-    fun createStringTemplate(variant: String): TemplateImpl?
+    fun createStringTemplate(element: PsiElement, from: Int, to: Int): Template?
 
     fun getMissingBraces(line: String): List<Char>?
-
-    fun getPrefix(line: String): String {
-        return getLastToken(line) ?: ""
-    }
 
     companion object {
         fun getInstance(language: Language): LanguageMLSupporter? {
