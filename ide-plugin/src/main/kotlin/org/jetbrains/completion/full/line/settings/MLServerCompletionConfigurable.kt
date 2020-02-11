@@ -52,39 +52,39 @@ class MLServerCompletionConfigurable(
                     }
 
                     row {
-                        checkBox(message("ml.server.completion.enable.comments"), settings::enableComments)
-                    }
-
-                    row {
                         checkBox(message("ml.server.completion.only.full"), settings::onlyFullLines)
                     }
 
                     row {
-                        val use = checkBox(message("ml.server.completion.top.n.use")).selected
+                        val use = checkBox(message("ml.server.completion.top.n.use"), settings::useTopN).selected
                         row { intTextFieldFixed(settings::topN, 1, IntRange(0, 100)) }.enableIf(use)
                     }
 
                     if (Registry.get("ml.server.completion.expand.settings").asBoolean()) {
-                        row(message("ml.server.completion.bs")) {
-                            row(message("ml.server.completion.bs.num.iterations")) {
-                                intTextFieldFixed(settings::numIterations, 1, IntRange(0, 50))
-                            }
-                            row(message("ml.server.completion.bs.beam.size")) {
-                                intTextFieldFixed(settings::beamSize, 1, IntRange(0, 20))
-                            }
-                            row(message("ml.server.completion.bs.diversity.strength")) {
-                                doubleTextField(settings::diversityStrength, 1, IntRange(0, 1))
-                            }
-                            row(message("ml.server.completion.bs.diversity.groups")) {
-                                intTextFieldFixed(settings::diversityGroups, 1, IntRange(0, 10))
-                                row {
-                                    val groupUse = checkBox(message("ml.server.completion.group.top.n.use")).selected
-                                    row { intTextFieldFixed(settings::groupTopN, 1, IntRange(0, 100)) }.enableIf(groupUse)
-                                }
-                            }
-                        }
+                        expandedSettingsPanel()
                     }
                 }.enableSubRowsIf(gpt)
+            }
+        }
+    }
+
+    private fun Row.expandedSettingsPanel() {
+        row(message("ml.server.completion.bs")) {
+            row(message("ml.server.completion.bs.num.iterations")) {
+                intTextFieldFixed(settings::numIterations, 1, IntRange(0, 50))
+            }
+            row(message("ml.server.completion.bs.beam.size")) {
+                intTextFieldFixed(settings::beamSize, 1, IntRange(0, 20))
+            }
+            row(message("ml.server.completion.bs.diversity.strength")) {
+                doubleTextField(settings::diversityStrength, 1, IntRange(0, 1))
+            }
+            row(message("ml.server.completion.bs.diversity.groups")) {
+                intTextFieldFixed(settings::diversityGroups, 1, IntRange(0, 10))
+                row {
+                    val groupUse = checkBox(message("ml.server.completion.group.top.n.use"), settings::useGroupTopN).selected
+                    row { intTextFieldFixed(settings::groupTopN, 1, IntRange(0, 10)) }.enableIf(groupUse)
+                }
             }
         }
     }
