@@ -1,10 +1,23 @@
 package org.jetbrains.completion.full.line.language
 
+import com.intellij.codeInsight.template.Template
 import com.intellij.codeInsight.template.impl.TemplateImpl
 import com.intellij.codeInsight.template.impl.TextExpression
+import com.intellij.openapi.util.TextRange
+import com.intellij.psi.PsiComment
+import com.intellij.psi.PsiElement
+import com.intellij.psi.SyntaxTraverser
+import com.jetbrains.python.psi.PyPlainStringElement
+import com.jetbrains.python.psi.PyStringElement
+import org.jetbrains.completion.full.line.length
+import org.jetbrains.completion.full.line.toIntRangeWithOffsets
 import java.util.*
 
 class PythonSupporter : LanguageMLSupporter {
+    override fun isComment(element: PsiElement): Boolean {
+        return (element is PsiComment || (element is PyPlainStringElement && element.isTripleQuoted))
+    }
+
     override fun getFirstToken(line: String): String? {
         var curToken = ""
         var offset = 0
@@ -23,36 +36,37 @@ class PythonSupporter : LanguageMLSupporter {
         return null
     }
 
-    override fun getLastToken(line: String): String? {
-        var curToken = ""
-        var offset = line.length
-        for (ch in line.reversed()) {
-            if (ch == '_' || ch.isLetter() || ch.isDigit()) {
-                curToken = ch + curToken
-            } else if (curToken.isNotEmpty()) {
-                return line.substring(offset, line.length)
-            } else {
-                return null
-            }
-            offset--
-        }
-        if (curToken.isNotEmpty())
-            return line.substring(offset, line.length)
-        return null
+    override fun createStringTemplate(element: PsiElement, from: Int, to: Int): Template? {
+        var id = 0
+        var content = element.text.substring(from, to)
+        var contentOffset = 0
+
+        return SyntaxTraverser.psiTraverser()
+                .withRoot(element)
+                .onRange(TextRange(from, to))
+                .filter { it is PyStringElement }
+                .asIterable()
+                .map {
+                    it as PyStringElement
+                    val range = it.textRange.toIntRangeWithOffsets(contentOffset - from, it.quote.length)
+                    val name = "\$__Variable${id++}\$"
+
+                    contentOffset += name.length - range.length() - 1
+                    content = content.replaceRange(range, name)
+                    it.content
+                }.let {
+                    createTemplate(content, it)
+                }
     }
 
-    override fun createStringTemplate(variant: String): TemplateImpl? {
-        val pair = prepareDataForTemplate(variant)
-        if (pair.second.isEmpty()) {
-            return null
+    private fun createTemplate(content: String, variables: List<String>): Template? {
+        return if (variables.isEmpty()) {
+            null
+        } else {
+            TemplateImpl("fakeKey", content, "ml server completion").apply {
+                variables.forEach { variable -> addVariable(TextExpression(variable), true) }
+            }
         }
-
-        val template = TemplateImpl("fakeKey", pair.first, "ml server completion")
-
-        pair.second.forEach { variable -> template.addVariable(TextExpression(variable), true) }
-        template.parseSegments()
-        template.addEndVariable()
-        return template
     }
 
     override fun getMissingBraces(line: String): List<Char>? {
@@ -77,18 +91,6 @@ class PythonSupporter : LanguageMLSupporter {
             return stack.reversed().map { OPEN_TO_CLOSE[it]!! }
         }
         return null
-    }
-
-
-    fun prepareDataForTemplate(variant: String): Pair<String, MutableList<String>> {
-        var i = 0
-        val variants = mutableListOf<String>()
-
-        return variant.replace(Regex("(\"(?:[^\"\\\\]|\\\\.)*\")|('(?:[^'\\\\]|\\\\.)*')")) { match ->
-            val value = match.value
-            variants.add(value.substring(1, value.length - 1))
-            value.first() + "\$__Variable${i++}\$" + value.last()
-        } to variants
     }
 
     companion object {
