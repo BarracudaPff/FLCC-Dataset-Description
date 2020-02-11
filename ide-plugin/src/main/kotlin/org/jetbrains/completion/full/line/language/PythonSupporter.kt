@@ -5,10 +5,21 @@ import com.intellij.codeInsight.template.impl.TextExpression
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.SyntaxTraverser
-import com.jetbrains.python.psi.PyStringElement
+import com.jetbrains.python.codeInsight.imports.PythonImportUtils
+import com.jetbrains.python.psi.PyElement
 import java.util.*
 
 class PythonSupporter : LanguageMLSupporter {
+    override fun autoImportFix(element: PsiElement, from: Int, to: Int) {
+        SyntaxTraverser.psiTraverser()
+                .withRoot(element)
+                .onRange(TextRange(from, to))
+                .filter { it.parent.reference != null && it.parent is PyElement }
+                .forEach {
+                    PythonImportUtils.proposeImportFix(it.parent as PyElement, it.parent.reference)?.applyFix()
+                }
+    }
+
     override fun getFirstToken(line: String): String? {
         var curToken = ""
         var offset = 0

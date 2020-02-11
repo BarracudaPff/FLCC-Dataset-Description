@@ -59,20 +59,8 @@ class FullLineInsertHandler(private val supporter: LanguageMLSupporter) : Insert
                     LiveTemplateLookupElementImpl.startTemplate(context, template)
                 }
             }
-        }
 
-        ApplicationManager.getApplication().runWriteAction {
-            SyntaxTraverser.psiTraverser()
-                    .withRoot(context.file)
-                    .onRange(TextRange(context.startOffset, context.selectionEndOffset))
-                    .filter { it.firstChild == null && !it.text.isBlank() }
-                    .forEach lit@{
-                        val ref = context.file.findReferenceAt(it.textOffset)
-                        val el = ref?.element ?: return@lit
-                        if (el is PyElement) {
-                            PythonImportUtils.proposeImportFix(el, ref)?.applyFix()
-                        }
-                    }
+            supporter.autoImportFix(context.file, context.startOffset, context.selectionEndOffset)
         }
     }
 
