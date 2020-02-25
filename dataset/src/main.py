@@ -6,6 +6,7 @@ from calibrate_dataset import calibrate
 from config import subject, dataDir
 from dump_error_reps import dump_errors
 from get_dataset import Dataset, modes
+from normalize import convert_state, normalize
 from prepare_repo_list import prepare_list
 from statistic import Statistic
 from utils.exts import extensions
@@ -42,9 +43,9 @@ dataset_parser.add_argument('--languages_file', type=str, default='languages.txt
 dataset_parser.add_argument('-mode', type=str, action="store", choices=['pga', 'borges'], required=True,
                             help='Use PGA')
 dataset_parser.add_argument('--only_master', type=bool, default=False,
-                            help='TODO')
+                            help='pick only master branch')
 dataset_parser.add_argument('--additional', type=str, action="append", nargs='*', choices=modes, default=[modes],
-                            help='TODO')
+                            help='Save additional meta-data like repository history or file\'s path')
 
 # A statistic command
 statistic_parser = subparsers.add_parser('statistic', help='Get statistic for downloaded dataset',
@@ -54,7 +55,7 @@ statistic_parser.add_argument('--languages_file', type=str, default='languages.t
 statistic_parser.add_argument('--modes', type=str, action="append", nargs='*',
                               choices=['languages', 'extensions', 'repositories'],
                               default=[['languages', 'extensions', 'repositories']],
-                              help='TODO')
+                              help='Choose what data must be added to statistic')
 
 # A prepare list command
 list_parser = subparsers.add_parser('prepare_list', help='Extract slice of repositories to downloading and compress',
@@ -73,7 +74,13 @@ errors_parser.add_argument('--skipped_file', type=str, default='skipped.txt',
 # A calibrate command
 calibrate_parser = subparsers.add_parser('calibrate', help='Calibrate dataset')
 calibrate_parser.add_argument('--only_master', type=bool, default=False,
-                              help='TODO')
+                              help='pick only master branch')
+
+# A calibrate command
+normalize_parser = subparsers.add_parser('normalize', help='Normalize dataset (currently only for Python3)')
+normalize_parser.add_argument('--convert_modes', type=str, action="append", nargs='*', choices=convert_state,
+                              default=[convert_state],
+                              help='Type `c` to remove comments and i to remove imports from files')
 
 
 def _dataset(args: argparse.Namespace):
@@ -104,6 +111,10 @@ def _dump_errors(args: argparse.Namespace):
 
 def _calibrate(args: argparse.Namespace):
     calibrate(args.email_notify, args.target_directory, args.only_master)
+
+
+def _normalize(args: argparse.Namespace):
+    normalize(args.email_notify, args.target_directory, args.convert_modes)
 
 
 def get_extensions(languages_file):
