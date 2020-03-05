@@ -24,16 +24,17 @@ Get list of current loaded models<br/>
 | type       | string (supported values: `main`, `custom`, `all`; default `all`)    | Type of completion model  |
 
 **Response:**
-```json5
+>// 'main' models: if model labled as main, it will be always available<br/>
+>// one of main models will be marked as 'best' (used as default for completion)<br/>
+>// 'custom' models: if model not labled as main, it has lifetime
+```json
 {
   "models": [
-    // 'main' models: if model labled as main, it will be always available
     {
       "model": "gpt-checkpoint0",
       "main": true,
-      "best": true // one of main models will be marked as 'best' (used as default for completion) 
+      "best": true
     },
-    // 'custom' models: if model not labled as main, it has lifetime
     {
       "model": "gpt-checkpoint0",
       "main": false,
