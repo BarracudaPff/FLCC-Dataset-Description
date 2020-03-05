@@ -24,7 +24,7 @@ Get list of current loaded models<br/>
 | type       | string (supported values: `main`, `custom`, `all`; default `all`)    | Type of completion model  |
 
 **Response:**
-```json
+```json5
 {
   "models": [
     // 'main' models: if model labled as main, it will be always available
