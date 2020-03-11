@@ -2,18 +2,17 @@ package org.jetbrains.completion.full.line
 
 import com.google.gson.Gson
 import com.intellij.openapi.diagnostic.Logger
-import com.intellij.openapi.progress.util.ProgressIndicatorUtils
 import com.intellij.openapi.util.ActionCallback
 import com.intellij.openapi.util.registry.Registry
 import com.intellij.util.concurrency.AppExecutorUtil
 import com.intellij.util.io.HttpRequests
 import org.jetbrains.completion.full.line.models.FullLineCompletionRequest
 import org.jetbrains.completion.full.line.models.FullLineCompletionResult
-import org.jetbrains.completion.full.line.models.FullLineCompletionStatus
+import org.jetbrains.completion.full.line.models.ModelType
+import org.jetbrains.completion.full.line.models.ModelsRequest
 import org.jetbrains.completion.full.line.settings.MLServerCompletionBundle
 import org.jetbrains.completion.full.line.settings.MLServerCompletionSettings
 import java.net.ConnectException
-import java.net.HttpURLConnection
 import java.net.SocketTimeoutException
 import java.util.concurrent.Callable
 import java.util.concurrent.ExecutionException
@@ -51,7 +50,7 @@ class GPTCompletionProvider {
             }
         })
 
-        ProgressIndicatorUtils.awaitWithCheckCanceled(future)
+        awaitWithCheckCanceled(future)
 
         LOG.debug("Time to predict completions is ${(System.currentTimeMillis() - start) / 1000.0}")
         return future.get(5, TimeUnit.SECONDS)
@@ -69,24 +68,20 @@ class GPTCompletionProvider {
         private val port = Registry.get("ml.server.completion.port").asInteger()
 
         fun getModels(): List<String> {
-            val future = executor.submit(Callable<List<String>> {
+            val future = executor.submit(Callable {
                 try {
-                    HttpRequests.request("http://$host:$port/v1/status").connect { r ->
-                        val res = Gson().fromJson(r.reader, FullLineCompletionStatus::class.java)
+                    HttpRequests.request("http://$host:$port/v1/models").connect { r ->
+                        val res = Gson().fromJson(r.reader, ModelsRequest::class.java)
 
-                        println("res")
-                        println(res)
-
-                        res.models.toList()
+                        listOf("best (${res.bestModel.name})") + res.models.map { model -> model.name }
                     }
                 } catch (e: Exception) {
-                    return@Callable emptyList()
+                    emptyList<String>()
                 }
             })
+            awaitWithCheckCanceled(future)
 
-//            ProgressIndicatorUtils.awaitWithCheckCanceled(future)
-
-            return listOf("best") + future.get()
+            return future.get()
         }
 
         fun getStatusCallback(): ActionCallback {
@@ -110,6 +105,6 @@ class GPTCompletionProvider {
 
         //Completion server cancels all threads besides the last one
         //We need at least 2 threads, the second one must (almost) instantly cancel the first one, otherwise, UI will freeze
-        private val executor = AppExecutorUtil.createBoundedApplicationPoolExecutor("ML Server Completion", 2)
+        val executor = AppExecutorUtil.createBoundedApplicationPoolExecutor("ML Server Completion", 2)
     }
 }
