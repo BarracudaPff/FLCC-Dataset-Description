@@ -1,22 +1,22 @@
-package org.jetbrains.completion.full.line.language
+package org.jetbrains.completion.full.line.language.supporters
 
 import com.intellij.codeInsight.template.Template
 import com.intellij.codeInsight.template.impl.TemplateImpl
 import com.intellij.codeInsight.template.impl.TextExpression
 import com.intellij.openapi.util.TextRange
+import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiElement
 import com.intellij.psi.SyntaxTraverser
 import com.jetbrains.python.codeInsight.imports.PythonImportUtils
 import com.jetbrains.python.psi.PyElement
-import com.intellij.openapi.util.TextRange
-import com.intellij.psi.PsiComment
-import com.intellij.psi.PsiElement
-import com.intellij.psi.SyntaxTraverser
+import com.jetbrains.python.psi.PyNumericLiteralExpression
 import com.jetbrains.python.psi.PyPlainStringElement
 import com.jetbrains.python.psi.PyStringElement
+import org.jetbrains.completion.full.line.language.LanguageMLSupporter
 import org.jetbrains.completion.full.line.length
 import org.jetbrains.completion.full.line.toIntRangeWithOffsets
 import java.util.*
+import kotlin.math.abs
 
 class PythonSupporter : LanguageMLSupporter {
     override fun autoImportFix(element: PsiElement, from: Int, to: Int) {
@@ -62,13 +62,21 @@ class PythonSupporter : LanguageMLSupporter {
                 .filter { it is PyStringElement }
                 .asIterable()
                 .map {
-                    it as PyStringElement
-                    val range = it.textRange.toIntRangeWithOffsets(contentOffset - from, it.quote.length)
-                    val name = "\$__Variable${id++}\$"
+                    if (it is PyStringElement) {
+                        var range = it.textRange.toIntRangeWithOffsets(contentOffset - from, it.quote.length)
+                        val name = "\$__Variable${id++}\$"
 
-                    contentOffset += name.length - range.length() - 1
-                    content = content.replaceRange(range, name)
-                    it.content
+                        contentOffset += name.length - range.length() - 1
+                        if (range.last<0) {
+                            range = IntRange(abs(range.last), abs(range.first))
+                        }
+
+                        content = content.replaceRange(range, name)
+                        it.content
+                    } else {
+                        it as PyNumericLiteralExpression
+                        ""
+                    }
                 }.let {
                     createTemplate(content, it)
                 }
