@@ -4,7 +4,6 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 
 interface NextLevelFullLineCompletion {
-    fun restartCompletion(project: Project, editor: Editor, line: String, addToToken: String)
+    fun restartCompletion(project: Project, editor: Editor, line: String)
     var firstLine: String?
-    var addToToken: String?
 }

@@ -42,7 +42,7 @@ class FullLineInsertHandler(private val supporter: LanguageMLSupporter) : Insert
                 val lineWithoutToken = document.getText(TextRange(startCompletion + end.length, endLine))
                 document.replaceString(startCompletion, endLine, end)
 
-                nextLevelService.restartCompletion(context.project, context.editor, lineWithoutToken, token)
+                nextLevelService.restartCompletion(context.project, context.editor, lineWithoutToken)
             } else {
                 val remove = removeOverwritingChars(
                         document.getText(TextRange.create(startCompletion, offset)),
