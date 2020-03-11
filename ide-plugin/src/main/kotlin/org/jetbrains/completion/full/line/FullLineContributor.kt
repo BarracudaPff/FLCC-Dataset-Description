@@ -3,7 +3,10 @@ package org.jetbrains.completion.full.line
 import com.intellij.codeInsight.completion.*
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.openapi.components.service
+import com.intellij.openapi.util.TextRange
+import com.jetbrains.python.inspections.quickfix.ReformatFix
 import icons.PythonIcons
+import org.jetbrains.completion.full.line.language.CodeFormatter
 import org.jetbrains.completion.full.line.language.LanguageMLSupporter
 import org.jetbrains.completion.full.line.models.FullLineCompletionMode
 import org.jetbrains.completion.full.line.services.NextLevelFullLineCompletion
@@ -20,25 +23,32 @@ class FullLineContributor : CompletionContributor() {
             return
 
         val supporter = LanguageMLSupporter.getInstance(parameters.originalFile.language) ?: return
+        val formatter = CodeFormatter.getInstance(parameters.originalFile.language) ?: return
 
         if (supporter.isComment(parameters.position)) {
             return
         }
 
-        handleFirstLine(result, supporter)
+        val context = if (settings.state.model.contains("gpt")) {
+            formatter.format(parameters.originalFile, TextRange(0, parameters.offset))
+        } else {
+            parameters.originalFile.text
+        }
 
-        val context = parameters.originalFile.text
         val filename = parameters.originalFile.name
         val offset = parameters.offset
-        val prefix = CompletionUtil.findAlphanumericPrefix(parameters)
+        val prefix = CompletionUtil.findJavaIdentifierPrefix(parameters)
+
+        handleFirstLine(result, supporter, prefix)
 
         for (variant in provider.getVariants(context, filename, prefix, offset)) {
             val element = getLookupElementBuilder(supporter, variant) ?: continue
+            element.putUserData(key, prefix)
             result.addElement(PrioritizedLookupElement.withPriority(element, 100000.0))
         }
     }
 
-    private fun handleFirstLine(result: CompletionResultSet, supporter: LanguageMLSupporter) {
+    private fun handleFirstLine(result: CompletionResultSet, supporter: LanguageMLSupporter, prefix: String) {
         if (service.firstLine != null) {
             val element = LookupElementBuilder.create(service.firstLine!!)
                     .withTypeText(FULL_LINE_TAIL_TEXT)
@@ -46,6 +56,7 @@ class FullLineContributor : CompletionContributor() {
                     .withTailText(provider.description, true)
                     .withIcon(GPT_ICON)
 
+            element.putUserData(key, prefix)
             result.addElement(PrioritizedLookupElement.withPriority(element, 1000000.0))
             service.firstLine = null
         }
