@@ -7,7 +7,10 @@ plugins {
 }
 
 group 'org.jetbrains.completion.full.line'
-version '0.0.4'
+if (project.hasProperty("teamcity"))
+    version = "0.1." + teamcity['build.number']
+else
+    version = '0.1.0'
 
 sourceCompatibility = 1.8
 
@@ -101,8 +104,8 @@ task generatePublicXML {
 }
 
 intellij {
-    version '193.4778.7-EAP-SNAPSHOT'
-    plugins "PythonCore:193.4778.7"
+    version '201.6073.9-EAP-SNAPSHOT'
+    plugins "PythonCore:201.6073.9"
 }
 
 runIde {
