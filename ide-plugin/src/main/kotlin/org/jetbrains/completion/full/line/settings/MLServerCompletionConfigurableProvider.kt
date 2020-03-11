@@ -6,7 +6,7 @@ import org.jetbrains.completion.full.line.GPTCompletionProvider
 
 class ServerCompletionConfigurableProvider : ConfigurableProvider() {
     override fun createConfigurable(): Configurable? {
-        return MLServerCompletionConfigurable {
+        return MLServerCompletionConfigurable(GPTCompletionProvider.getModels()) {
             GPTCompletionProvider.getStatusCallback()
         }
     }

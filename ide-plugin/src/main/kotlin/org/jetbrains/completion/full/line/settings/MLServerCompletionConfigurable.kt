@@ -6,14 +6,18 @@ import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.util.ActionCallback
 import com.intellij.openapi.util.registry.Registry
 import com.intellij.ui.JBColor
+import com.intellij.ui.MutableCollectionComboBoxModel
 import com.intellij.ui.layout.*
 import com.intellij.util.ui.AsyncProcessIcon
+import org.jdesktop.swingx.combobox.ListComboBoxModel
 import org.jetbrains.completion.full.line.models.FullLineCompletionMode
 import org.jetbrains.completion.full.line.settings.MLServerCompletionBundle.Companion.message
 import java.awt.Color
 import javax.swing.JLabel
+import kotlin.reflect.KMutableProperty0
 
 class MLServerCompletionConfigurable(
+        private val models: List<String>,
         private val statusChecker: () -> ActionCallback
 ) : BoundConfigurable("Server Code Completion"), SearchableConfigurable {
     private lateinit var gpt: ComponentPredicate
@@ -28,7 +32,7 @@ class MLServerCompletionConfigurable(
                     gpt = checkBox(message("ml.server.completion.title"), settings::enable).selected
                     row {
                         cell {
-                            button("Test Connection") { checkStatus() }
+                            button(message("ml.server.completion.connection")) { checkStatus() }
                             loadingIcon = loadingIcon().component
                             statusText = statusText("").component
                         }
@@ -56,6 +60,14 @@ class MLServerCompletionConfigurable(
                     }
 
                     row {
+                        checkBox(message("ml.server.completion.group.answers"), settings::groupAnswers)
+                    }
+
+                    row {
+                        checkBox(message("ml.server.completion.normalize"), settings::normalize)
+                    }
+
+                    row {
                         val use = checkBox(message("ml.server.completion.top.n.use"), settings::useTopN).selected
                         row { intTextFieldFixed(settings::topN, 1, IntRange(0, 100)) }.enableIf(use)
                     }
@@ -70,6 +82,10 @@ class MLServerCompletionConfigurable(
 
     private fun Row.expandedSettingsPanel() {
         row(message("ml.server.completion.bs")) {
+            row(message("ml.server.completion.model.pick")) {
+                comboBox(MutableCollectionComboBoxModel(models), settings::model)
+            }
+
             row(message("ml.server.completion.bs.num.iterations")) {
                 intTextFieldFixed(settings::numIterations, 1, IntRange(0, 50))
             }
@@ -90,12 +106,13 @@ class MLServerCompletionConfigurable(
     }
 
     private fun checkStatus() {
+        val t1 = System.currentTimeMillis()
         loadingIcon.resume()
         loadingIcon.isVisible = true
         statusText.isVisible = false
 
         statusChecker().doWhenDone {
-            statusText.text = "Successful"
+            statusText.text = "Successful with ${System.currentTimeMillis() - t1}ms delay"
             statusText.foreground = JBColor(JBColor.GREEN.darker(), JBColor.GREEN.brighter())
         }.doWhenRejected(Runnable {
             statusText.text = "Invalid"

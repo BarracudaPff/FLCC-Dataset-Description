@@ -52,6 +52,9 @@ class MLServerCompletionSettings : PersistentStateComponent<MLServerCompletionSe
 
             //Additional setting for correct usage
             var useTopN: Boolean = false,
-            var useGroupTopN: Boolean = false
+            var useGroupTopN: Boolean = false,
+            var model: String = "best",
+            var groupAnswers: Boolean = false,
+            var normalize: Boolean = false
     )
 }
