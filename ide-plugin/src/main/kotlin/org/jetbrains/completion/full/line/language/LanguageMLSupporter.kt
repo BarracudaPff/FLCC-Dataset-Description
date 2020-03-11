@@ -4,6 +4,7 @@ import com.intellij.codeInsight.template.Template
 import com.intellij.lang.Language
 import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiElement
+import org.jetbrains.completion.full.line.language.supporters.PythonSupporter
 
 interface LanguageMLSupporter {
     fun isComment(element: PsiElement): Boolean = element is PsiComment
