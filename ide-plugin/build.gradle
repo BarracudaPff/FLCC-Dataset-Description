@@ -89,7 +89,7 @@ task generatePublicXML {
                     xml.version(version)
                     'idea-version'("since-build": "193")
                     vendor('url': 'https://www.jetbrains.com', "JetBrains")
-                    'download-url'(buildPlugin.archiveFileName.get())
+                    'download-url'(buildPlugin.archiveFileName.get() + branchParameter())
                     xml.description {
                         mkp.yieldUnescaped('<![CDATA[\n' +
                                 '           <p>A prototype for showing full line code completion variants in IntelliJ</p>\n' +
@@ -101,6 +101,18 @@ task generatePublicXML {
             }
         }
     }
+}
+
+def branchParameter() {
+    "?branch=refs/heads/${gitBranch()}"
+}
+
+def gitBranch() {
+    def branch = ""
+    def proc = "git --git-dir ${project.projectDir.toString()}/../.git rev-parse  --abbrev-ref HEAD".execute()
+    proc.in.eachLine { line -> branch = line }
+    proc.waitFor()
+    branch
 }
 
 intellij {
