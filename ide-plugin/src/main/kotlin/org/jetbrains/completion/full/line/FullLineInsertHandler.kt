@@ -49,29 +49,27 @@ class FullLineInsertHandler(private val supporter: LanguageMLSupporter) : Insert
                         document.getText(TextRange.create(offset, endLine))
                 )
                 document.deleteString(offset, offset + remove)
-                if (context.file.findElementAt(offset) !is PyStringElement) {
 
-                    val missingBracesAmount = supporter.getMissingBraces(ans)
-                            ?.joinToString()
-                            ?.let { it ->
-                                document.insertString(offset, it)
-                                it.length
-                            } ?: 0
+                val missingBracesAmount = supporter.getMissingBraces(ans)
+                        ?.joinToString()
+                        ?.let { it ->
+                            document.insertString(offset, it)
+                            it.length
+                        } ?: 0
 
-                    if (MLServerCompletionSettings.getInstance().enableStringsWalking()) {
-                        val fixedStart = context.file
-                                .findElementAt(startCompletion)
-                                ?.textRange
-                                ?.startOffset
-                                ?.apply { document.deleteString(this, startCompletion) }
-                                ?: startCompletion
+                if (MLServerCompletionSettings.getInstance().enableStringsWalking()) {
+                    val fixedStart = context.file
+                            .findElementAt(startCompletion)
+                            ?.textRange
+                            ?.startOffset
+                            ?.apply { document.deleteString(this, startCompletion) }
+                            ?: startCompletion
 
-                        val template = supporter.createStringTemplate(context.file, fixedStart, offset + missingBracesAmount)
-                        if (template != null) {
-                            LiveTemplateLookupElementImpl.startTemplate(context, template)
-                        }
-
+                    val template = supporter.createStringTemplate(context.file, fixedStart, offset + missingBracesAmount)
+                    if (template != null) {
+                        LiveTemplateLookupElementImpl.startTemplate(context, template)
                     }
+
                 }
                 try {
                     supporter.autoImportFix(context.file, context.startOffset, context.selectionEndOffset)
