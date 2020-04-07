@@ -20,12 +20,12 @@ logging.getLogger().setLevel(logging.DEBUG)
 logging.getLogger("pytorch_transformers.tokenization_utils").disabled = True
 logging.getLogger("urllib3.connectionpool").disabled = True
 
-app.register_blueprint(api, url_prefix='/v1')
+app.register_blueprint(api, url_prefix="/v1")
 FlaskInjector(app=app, modules=[AppModule])
 
 
 def nginx(_config):
-    if _config['debug']:
+    if _config["debug"]:
         logging.getLogger().setLevel(logging.DEBUG)
     else:
         logging.getLogger().setLevel(logging.INFO)
@@ -35,23 +35,23 @@ def nginx(_config):
     if config["processes"] > 0:
         app.processes = config["processes"]
 
-    http_server = WSGIServer(('', 8001), app)
-    logging.info('Server is running on Nginx correctly!')
+    http_server = WSGIServer(("", 8001), app)
+    logging.info("Server is running on Nginx correctly!")
     http_server.serve_forever()
 
 
 def default(_config):
     app.run(
-        host=_config['host'],
-        port=_config['port'],
-        debug=_config['debug'],
-        use_evalex=_config['interactive_debugger']
+        host=_config["host"],
+        port=_config["port"],
+        debug=_config["debug"],
+        use_evalex=_config["interactive_debugger"]
     )
 
 
-if __name__ == '__main__':
-    _config = app.config['run']
-    if _config['nginx']:
+if __name__ == "__main__":
+    _config = app.config["run"]
+    if _config["nginx"]:
         nginx(_config)
     else:
         default(_config)

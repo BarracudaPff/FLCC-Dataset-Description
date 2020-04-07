@@ -75,6 +75,7 @@ err = partial(click.secho, fg="red", err=True)
 pygram.initialize(CACHE_DIR)
 syms = pygram.python_symbols
 
+
 # import time
 # _err_filename = 'err_black_'+str(time.time())+'.txt'
 # out('Black errors will be logged to '+_err_filename)
@@ -86,8 +87,10 @@ def add_file_with_big_lines(file):
     # err_file.write(str(file)+'\n')
     # err_file.flush()
 
+
 class MyException(Exception):
     """ddas"""
+
 
 class NothingChanged(UserWarning):
     """Raised when reformatted code is the same as source."""
@@ -2579,6 +2582,7 @@ def normalize_string_quotes(leaf: Leaf) -> None:
     Note: Mutates its argument.
     """
     value = leaf.value.lstrip("furbFURB")
+    # print("@normalize_string_quotes: " + value)
     if value[:3] == '"""':
         return
 
@@ -2600,6 +2604,8 @@ def normalize_string_quotes(leaf: Leaf) -> None:
     escaped_new_quote = re.compile(rf"([^\\]|^)\\((?:\\\\)*){new_quote}")
     escaped_orig_quote = re.compile(rf"([^\\]|^)\\((?:\\\\)*){orig_quote}")
     body = leaf.value[first_quote_pos + len(orig_quote): -len(orig_quote)]
+    print("@body: " + body)
+    print("@new_quote: " + new_quote)
     if "r" in prefix.casefold():
         if unescaped_new_quote.search(body):
             # There's at least one unescaped new_quote in this raw string
@@ -2610,13 +2616,19 @@ def normalize_string_quotes(leaf: Leaf) -> None:
         new_body = body
     else:
         # remove unnecessary escapes
+        # print("@body2: " + body)
+        # print("@replace1: " + escaped_new_quote.sub(new_quote, body))
+        # print("@replace2: " + escaped_new_quote.sub(new_quote, escaped_new_quote.sub(new_quote, body)))
         new_body = sub_twice(escaped_new_quote, rf"\1\2{new_quote}", body)
+        # print("@new_body: " + new_body)
         if body != new_body:
             # Consider the string without unnecessary escapes as the original
             body = new_body
             leaf.value = f"{prefix}{orig_quote}{body}{orig_quote}"
         new_body = sub_twice(escaped_orig_quote, rf"\1\2{orig_quote}", new_body)
+        # print("@new_body: " + new_body)
         new_body = sub_twice(unescaped_new_quote, rf"\1\\{new_quote}", new_body)
+        # print("@new_body: " + new_body)
     if "f" in prefix.casefold():
         matches = re.findall(r"[^{]\{(.*?)\}[^}]", new_body)
         for m in matches:
@@ -2626,6 +2638,8 @@ def normalize_string_quotes(leaf: Leaf) -> None:
     if new_quote == '"""' and new_body[-1:] == '"':
         # edge case:
         new_body = new_body[:-1] + '\\"'
+    print("@new_body: " + new_body)
+    print("@new_quote: " + new_quote)
     orig_escape_count = body.count("\\")
     new_escape_count = new_body.count("\\")
     if new_escape_count > orig_escape_count:
@@ -2634,6 +2648,7 @@ def normalize_string_quotes(leaf: Leaf) -> None:
     if new_escape_count == orig_escape_count and orig_quote == '"':
         return  # Prefer double quotes
 
+    print("@leaf.value: " + f"{prefix}{new_quote}{new_body}{new_quote}")
     leaf.value = f"{prefix}{new_quote}{new_body}{new_quote}"
 
 
