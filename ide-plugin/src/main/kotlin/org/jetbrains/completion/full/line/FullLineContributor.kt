@@ -41,6 +41,8 @@ class FullLineContributor : CompletionContributor() {
         val offset = context.length
         val prefix = CompletionUtil.findJavaIdentifierPrefix(parameters)
 
+        LOG.debug("Completion data:\n\tfilename: $filename\n\toffset: $offset\n\tprefix: $prefix")
+
         handleFirstLine(result, supporter, prefix)
 
         for (variant in provider.getVariants(context, filename, prefix, offset)) {
@@ -52,6 +54,7 @@ class FullLineContributor : CompletionContributor() {
 
     private fun handleFirstLine(result: CompletionResultSet, supporter: LanguageMLSupporter, prefix: String) {
         if (service.firstLine != null) {
+            LOG.debug("First line: ${service.firstLine}")
             val element = LookupElementBuilder.create(service.firstLine!!)
                     .withTypeText(FULL_LINE_TAIL_TEXT)
                     .withInsertHandler(FullLineInsertHandler(supporter))
@@ -92,5 +95,7 @@ class FullLineContributor : CompletionContributor() {
     companion object {
         const val FULL_LINE_TAIL_TEXT = "full-line"
         val GPT_ICON: Icon = PythonIcons.Python.Python
+
+        val LOG = Logger.getInstance(FullLineContributor::class.java)
     }
 }

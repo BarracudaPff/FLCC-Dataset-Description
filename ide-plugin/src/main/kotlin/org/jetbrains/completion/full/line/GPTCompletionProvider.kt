@@ -56,7 +56,11 @@ class GPTCompletionProvider {
         awaitWithCheckCanceled(future)
 
         LOG.debug("Time to predict completions is ${(System.currentTimeMillis() - start) / 1000.0}")
-        return future.get(5, TimeUnit.SECONDS)
+        return try {
+            future.get(5, TimeUnit.SECONDS)
+        } catch (e: Exception) {
+            logError(e)
+        }
     }
 
     private fun logError(msg: String, throwable: Throwable): List<String> {
@@ -65,6 +69,8 @@ class GPTCompletionProvider {
     }
 
     private fun logError(error: RequestError): List<String> = logError("Server request", error)
+
+    private fun logError(error: Throwable): List<String> = logError("Server request", error)
 
     companion object {
         private val LOG = Logger.getInstance(FullLineContributor::class.java)
