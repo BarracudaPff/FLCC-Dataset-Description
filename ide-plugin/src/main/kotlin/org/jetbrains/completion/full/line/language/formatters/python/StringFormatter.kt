@@ -14,11 +14,34 @@ class StringFormatter : ElementFormatter {
 
     override fun format(element: PsiElement): String {
         element as PyStringElement
-        return if (element.isTripleQuoted) {
-            element.text
-        } else {
-            element.prefix + "\"" + element.content + "\""
+
+        if (element.quote == TRIPLE_QUOTE) {
+            return element.text
         }
+
+        val quote = if (element.isTripleQuoted) {
+            TRIPLE_QUOTE
+        } else {
+            fixQuote(element.content)
+        }
+
+        val content = if (element.prefix.contains("r")) {
+            element.content
+        } else {
+            unescapedNewQuote.replace(element.content, SINGLE_QUOTE)
+        }
+        return element.prefix + quote + content + quote
     }
 
+    private fun fixQuote(content: String): String {
+        return if (content.contains("\"") && !content.contains("\\\"")) SINGLE_QUOTE else DOUBLE_QUOTE
+    }
+
+    companion object {
+        const val TRIPLE_QUOTE = "\"\"\""
+        const val SINGLE_QUOTE = "\'"
+        const val DOUBLE_QUOTE = "\""
+
+        val unescapedNewQuote = Regex("(([\\\\])(^\\\\\\\\)*)$SINGLE_QUOTE")
+    }
 }

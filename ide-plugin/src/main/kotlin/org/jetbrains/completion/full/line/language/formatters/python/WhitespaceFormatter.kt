@@ -1,5 +1,6 @@
 package org.jetbrains.completion.full.line.language.formatters.python
 
+import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiWhiteSpace
 import org.jetbrains.completion.full.line.language.ElementFormatter
@@ -14,6 +15,10 @@ class WhitespaceFormatter : ElementFormatter {
     override fun format(element: PsiElement): String {
         if (skip) {
             skip = false
+            return ""
+        }
+
+        if (element.prevSibling is PsiComment) {
             return ""
         }
 

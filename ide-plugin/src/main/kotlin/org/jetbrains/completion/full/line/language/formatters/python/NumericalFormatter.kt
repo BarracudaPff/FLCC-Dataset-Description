@@ -6,7 +6,7 @@ import org.jetbrains.completion.full.line.language.ElementFormatter
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 
-class NumericalFormatter : ElementFormatter {
+class NumericalFormatter(private val allowUnderscores:Boolean) : ElementFormatter {
     private val formatter = DecimalFormat("")
     private val symbols: DecimalFormatSymbols
 
@@ -48,10 +48,10 @@ class NumericalFormatter : ElementFormatter {
                 } else if (after.startsWith('+')) {
                     after = after.drop(1)
                 }
-                formatFloatOrInt(parts[0]) + 'e' + sign + formatInt(after).toUpperCase()
+                formatFloatOrInt(parts[0], allowUnderscores) + 'e' + sign + formatInt(after, allowUnderscores).toUpperCase()
             }
             else -> {
-                formatFloatOrInt(text)
+                formatFloatOrInt(text, allowUnderscores)
             }
         }
         return coreSign + a
