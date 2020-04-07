@@ -1,6 +1,7 @@
 <idea-plugin>
     <id>org.jetbrains.completion.full.line</id>
     <name>Full Line Code Completion</name>
+    <idea-version since-build="201"/>
     <vendor url="https://www.jetbrains.com">JetBrains</vendor>
 
     <description><![CDATA[
