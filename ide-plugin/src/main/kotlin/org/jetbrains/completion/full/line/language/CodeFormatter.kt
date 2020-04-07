@@ -7,14 +7,11 @@ import com.intellij.psi.SyntaxTraverser
 import com.intellij.refactoring.suggested.startOffset
 import org.jetbrains.completion.full.line.language.formatters.PythonCodeFormatter
 
-abstract class CodeFormatter(
-        private val elementFormatters: Array<ElementFormatter>
-) {
+abstract class CodeFormatter(private val elementFormatters: Array<ElementFormatter>) {
     private val filters = elementFormatters.map { it::filter }
 
-    fun format(element: PsiElement, range: TextRange, extra: ((PsiElement, StringBuilder) -> Unit)? = null): String {
+    fun format(element: PsiElement, range: TextRange): String {
         val code = StringBuilder()
-        var skip = false
 
         var skipUntil = 0
         SyntaxTraverser.psiTraverser()
@@ -22,17 +19,15 @@ abstract class CodeFormatter(
                 .onRange(range)
                 .filter { el -> filters.mapNotNull { it(el) }.any { it } }
                 .forEach lit@{
-                    if (it.textOffset < skipUntil || skip) {
+                    if (it.textOffset < skipUntil) {
                         return@lit
                     }
 
                     if (it.startOffset + it.text.length >= range.endOffset) {
-                        code.append(it.text.slice(IntRange(0, (range.endOffset - it.startOffset-1))))
-                        skip = true
-                        return@lit
+                        val text = formatFinalElement(it, range)
+                        code.append(text)
+                        return code.toString()
                     }
-
-                    extra?.let { f -> f(it, code) }
 
                     var sk = false
 
@@ -47,6 +42,8 @@ abstract class CodeFormatter(
                 }
         return code.toString()
     }
+
+    abstract fun formatFinalElement(element: PsiElement, range: TextRange): String
 
     companion object {
         fun getInstance(language: Language): CodeFormatter? {
