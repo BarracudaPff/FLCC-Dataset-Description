@@ -30,7 +30,7 @@ class PythonSupporter : LanguageMLSupporter {
     }
 
     override fun isComment(element: PsiElement): Boolean {
-        return (element is PsiComment || (element is PyPlainStringElement && element.isTripleQuoted))
+        return (element is PsiComment || element is PyStringElement)
     }
 
     override fun getFirstToken(line: String): String? {
