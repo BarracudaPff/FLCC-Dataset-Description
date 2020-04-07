@@ -3,8 +3,10 @@ package org.jetbrains.completion.full.line
 import com.intellij.codeInsight.completion.*
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.openapi.components.service
+import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.editor.Document
 import com.intellij.openapi.util.TextRange
-import com.jetbrains.python.inspections.quickfix.ReformatFix
+import com.intellij.psi.PsiFile
 import icons.PythonIcons
 import org.jetbrains.completion.full.line.language.CodeFormatter
 import org.jetbrains.completion.full.line.language.LanguageMLSupporter
@@ -25,7 +27,7 @@ class FullLineContributor : CompletionContributor() {
         val supporter = LanguageMLSupporter.getInstance(parameters.originalFile.language) ?: return
         val formatter = CodeFormatter.getInstance(parameters.originalFile.language) ?: return
 
-        if (supporter.isComment(parameters.position)) {
+        if (supporter.isComment(parameters.position) || insideLine(parameters.editor.document, parameters.offset)) {
             return
         }
 
@@ -35,8 +37,8 @@ class FullLineContributor : CompletionContributor() {
             parameters.originalFile.text
         }
 
-        val filename = parameters.originalFile.name
-        val offset = parameters.offset
+        val filename = getFilePath(parameters.originalFile)
+        val offset = context.length
         val prefix = CompletionUtil.findJavaIdentifierPrefix(parameters)
 
         handleFirstLine(result, supporter, prefix)
@@ -71,6 +73,20 @@ class FullLineContributor : CompletionContributor() {
                     .withTypeText(FULL_LINE_TAIL_TEXT)
                     .withInsertHandler(FullLineInsertHandler(supporter))
         }.withTailText(provider.description, true).withIcon(GPT_ICON)
+    }
+
+    private fun insideLine(document: Document, offset: Int): Boolean {
+        val endLine = document.getLineEndOffset(document.getLineNumber(offset))
+        val rightText = document.getText(TextRange(offset, endLine))
+
+        return rightText.isNotBlank()
+    }
+
+    private fun getFilePath(file: PsiFile): String {
+        val projectPath = file.project.basePath ?: "/"
+        val filePath = file.virtualFile.path
+
+        return filePath.drop(projectPath.length + 1)
     }
 
     companion object {
