@@ -2,7 +2,6 @@ package org.jetbrains.completion.full.line
 
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.progress.ProgressManager
-import com.intellij.openapi.progress.util.ProgressIndicatorUtils
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.TextRange
 import com.intellij.util.ExceptionUtil
@@ -28,7 +27,10 @@ val key = Key<String>("flcc-prefix")
 fun <T> awaitWithCheckCanceled(future: Future<T>): T {
     val indicator = ProgressManager.getInstance().progressIndicator
     while (true) {
-        ProgressIndicatorUtils.checkCancelledEvenWithPCEDisabled(indicator)
+        if (indicator != null && indicator.isCanceled) {
+            indicator.checkCanceled() // maybe it'll throw with some useful additional information
+            throw ProcessCanceledException()
+        }
         try {
             return future[10, TimeUnit.MILLISECONDS]
         } catch (ignore: TimeoutException) {
