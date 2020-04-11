@@ -6,7 +6,13 @@ import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader
 
-interface FilesTest {
+object FilesTest {
+    const val TEMP = "TEMP_FILE"
+
+    fun fullPath(filename: String): String {
+        return FilesTest::class.java.classLoader.getResource(filename)!!.path
+    }
+
     fun readerContent(reader: BufferedReader): String {
         return StringBuilder().apply {
             reader.lineSequence().forEach {
@@ -19,10 +25,6 @@ interface FilesTest {
         val path = fullPath(filename)
 
         return readerContent(BufferedReader(FileReader(path)))
-    }
-
-    fun fullPath(filename: String): String {
-        return javaClass.classLoader.getResource(filename)!!.path
     }
 
     fun createTempFile(filename: String): String {
@@ -46,9 +48,5 @@ interface FilesTest {
         if (File(path).exists()) {
             FileUtils.forceDelete(File(path))
         }
-    }
-
-    companion object {
-        const val TEMP = "TEMP_FILE"
     }
 }

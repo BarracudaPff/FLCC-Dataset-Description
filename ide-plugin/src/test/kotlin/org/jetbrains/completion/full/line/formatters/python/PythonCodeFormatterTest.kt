@@ -2,7 +2,12 @@ package org.jetbrains.completion.full.line.formatters.python
 
 import com.intellij.openapi.util.TextRange
 import com.jetbrains.python.PythonFileType
-import org.jetbrains.completion.full.line.FilesTest.Companion.TEMP
+import org.jetbrains.completion.full.line.FilesTest.TEMP
+import org.jetbrains.completion.full.line.FilesTest.fullPath
+import org.jetbrains.completion.full.line.FilesTest.readFile
+import org.jetbrains.completion.full.line.FilesTest.readTempFile
+import org.jetbrains.completion.full.line.FilesTest.readerContent
+import org.jetbrains.completion.full.line.FilesTest.createTempFile
 import org.jetbrains.completion.full.line.formatters.CodeFormatterTest
 import org.jetbrains.completion.full.line.language.formatters.PythonCodeFormatter
 import org.junit.Assert
