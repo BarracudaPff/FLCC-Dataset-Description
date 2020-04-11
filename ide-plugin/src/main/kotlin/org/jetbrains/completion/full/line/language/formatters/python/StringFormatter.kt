@@ -15,10 +15,6 @@ class StringFormatter : ElementFormatter {
     override fun format(element: PsiElement): String {
         element as PyStringElement
 
-        if (element.quote == TRIPLE_QUOTE) {
-            return element.text
-        }
-
         val quote = if (element.isTripleQuoted) {
             TRIPLE_QUOTE
         } else {
