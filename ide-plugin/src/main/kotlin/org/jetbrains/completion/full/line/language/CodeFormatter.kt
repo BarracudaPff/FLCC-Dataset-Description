@@ -5,6 +5,7 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.SyntaxTraverser
 import com.intellij.refactoring.suggested.startOffset
+import com.jetbrains.python.PythonLanguage
 import org.jetbrains.completion.full.line.language.formatters.PythonCodeFormatter
 
 abstract class CodeFormatter(private val elementFormatters: Array<ElementFormatter>) {
@@ -48,7 +49,7 @@ abstract class CodeFormatter(private val elementFormatters: Array<ElementFormatt
     companion object {
         fun getInstance(language: Language): CodeFormatter? {
             return when (language) {
-                Language.findLanguageByID("Python") -> PythonCodeFormatter()
+                PythonLanguage.getInstance() -> PythonCodeFormatter()
                 else -> null
             }
         }

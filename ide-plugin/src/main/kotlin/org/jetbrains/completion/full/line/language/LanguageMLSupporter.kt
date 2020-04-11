@@ -4,6 +4,7 @@ import com.intellij.codeInsight.template.Template
 import com.intellij.lang.Language
 import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiElement
+import com.jetbrains.python.PythonLanguage
 import org.jetbrains.completion.full.line.language.supporters.PythonSupporter
 
 interface LanguageMLSupporter {
@@ -20,7 +21,7 @@ interface LanguageMLSupporter {
     companion object {
         fun getInstance(language: Language): LanguageMLSupporter? {
             return when (language) {
-                Language.findLanguageByID("Python") -> PythonSupporter()
+                PythonLanguage.getInstance() -> PythonSupporter()
                 else -> null
             }
         }
