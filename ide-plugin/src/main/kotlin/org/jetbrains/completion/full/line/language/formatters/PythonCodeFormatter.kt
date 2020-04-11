@@ -7,25 +7,20 @@ import org.jetbrains.completion.full.line.language.CodeFormatter
 import org.jetbrains.completion.full.line.language.formatters.python.*
 
 class PythonCodeFormatter : CodeFormatter(arrayOf(
-        WhitespaceFormatter()
-        , CommentFormatter()
-        , NumericalFormatter(false)
-        , ImportFormatter()
-        , ParenthesizedWithoutTuplesFormatter()
-        , StringFormatter()
-        , ListLiteralFormatter()
-        , ArgumentListFormatter()
-        , SequenceFormatter()
-        , ParameterListFormatter()
-        , DumpFormatter()
+        WhitespaceFormatter(),
+        CommentFormatter(),
+        NumericalFormatter(false),
+        ImportFormatter(),
+        ParenthesizedWithoutTuplesFormatter(),
+        StringFormatter(),
+        ListLiteralFormatter(),
+        ArgumentListFormatter(),
+        SequenceFormatter(),
+        ParameterListFormatter(),
+        DumpFormatter()
 )) {
     override fun formatFinalElement(element: PsiElement, range: TextRange): String {
         val text = element.text.slice(IntRange(0, (range.endOffset - element.startOffset - 1)))
-
-        println(text)
-        println(fixTabs(text))
-        println("|" + text + fixTabs(text) + "|")
-
         return text + fixTabs(text)
     }
 }
