@@ -9,5 +9,5 @@ data class Model(
         val startAt: String?,
         @SerializedName("time_left")
         val timeLeft: Int?,
-        val type: ModelType
+        val type: String
 )
