@@ -2,10 +2,5 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/dataset/data/data" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/dataset/data/data2" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/dataset/data/siva" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/dataset/scripts/siva" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/dataset/siva" vcs="Git" />
   </component>
 </project>

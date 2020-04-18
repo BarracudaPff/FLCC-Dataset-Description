@@ -1,51 +1,101 @@
 package org.jetbrains.completion.full.line
 
-import com.intellij.codeInsight.completion.CompletionContributor
-import com.intellij.codeInsight.completion.CompletionParameters
-import com.intellij.codeInsight.completion.CompletionResultSet
-import com.intellij.codeInsight.completion.PrioritizedLookupElement
+import com.intellij.codeInsight.completion.*
 import com.intellij.codeInsight.lookup.LookupElementBuilder
+import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.Logger
-import com.intellij.openapi.fileEditor.FileEditorManager
-import com.intellij.openapi.util.registry.Registry
+import com.intellij.openapi.editor.Document
+import com.intellij.openapi.util.TextRange
+import com.intellij.psi.PsiFile
 import icons.PythonIcons
+import org.jetbrains.completion.full.line.language.CodeFormatter
+import org.jetbrains.completion.full.line.language.LanguageMLSupporter
+import org.jetbrains.completion.full.line.models.FullLineCompletionMode
+import org.jetbrains.completion.full.line.services.NextLevelFullLineCompletion
+import org.jetbrains.completion.full.line.settings.MLServerCompletionSettings
+import javax.swing.Icon
 
 class FullLineContributor : CompletionContributor() {
-    companion object {
-        const val FULL_LINE_TAIL_TEXT = "full-line"
+    private val provider = GPTCompletionProvider()
+    private val settings = MLServerCompletionSettings.getInstance()
+    private val service: NextLevelFullLineCompletion = service()
 
-        val LOG = Logger.getInstance(FullLineContributor::class.java)
+    override fun fillCompletionVariants(parameters: CompletionParameters, result: CompletionResultSet) {
+        if (!settings.isEnabled() || (parameters.isAutoPopup && !settings.isAutoPopup()))
+            return
 
-        val INSERT_HANDLER = FullLineInsertHandler()
+        val supporter = LanguageMLSupporter.getInstance(parameters.originalFile.language) ?: return
+        val formatter = CodeFormatter.getInstance(parameters.originalFile.language) ?: return
 
-        private fun completionServerUrl(): String {
-            val url = Registry.get("full.line.completion.server.url").asString()
-            val port = Registry.get("full.line.completion.server.port").asInteger()
-            return "http://$url:$port"
+        if (supporter.isComment(parameters.position) || insideLine(parameters.editor.document, parameters.offset)) {
+            return
+        }
+
+        val context = if (settings.state.model.contains("gpt")) {
+            formatter.format(parameters.originalFile, TextRange(0, parameters.offset))
+        } else {
+            parameters.originalFile.text
+        }
+
+        val filename = getFilePath(parameters.originalFile)
+        val offset = context.length
+        val prefix = CompletionUtil.findJavaIdentifierPrefix(parameters)
+
+        LOG.debug("Completion data:\n\tfilename: $filename\n\toffset: $offset\n\tprefix: $prefix")
+
+        handleFirstLine(result, supporter, prefix)
+
+        for (variant in provider.getVariants(context, filename, prefix, offset)) {
+            val element = getLookupElementBuilder(supporter, variant) ?: continue
+            element.putUserData(key, prefix)
+            result.addElement(PrioritizedLookupElement.withPriority(element, 100000.0))
         }
     }
 
-    private val providers: List<FullLineCompletionProvider> = listOf(
-        NetworkCompletionProvider("gpt", "${completionServerUrl()}/v1/complete/gpt"),
-        NetworkCompletionProvider("char-rnn", "${completionServerUrl()}/v1/complete/charrnn")
-    )
-
-    override fun fillCompletionVariants(parameters: CompletionParameters, result: CompletionResultSet) {
-        if (!Registry.`is`("full.line.completion.enable"))
-            return
-
-        val context = parameters.originalFile.text.substring(0, parameters.offset)
-        val filename = parameters.originalFile.name
-
-        for (provider in providers) {
-            for (variant in provider.getVariants(context, filename)) {
-                val lookupElementBuilder = LookupElementBuilder.create(variant)
-                    .withTailText("  ${provider.description}", true)
+    private fun handleFirstLine(result: CompletionResultSet, supporter: LanguageMLSupporter, prefix: String) {
+        if (service.firstLine != null) {
+            LOG.debug("First line: ${service.firstLine}")
+            val element = LookupElementBuilder.create(service.firstLine!!)
                     .withTypeText(FULL_LINE_TAIL_TEXT)
-                    .withIcon(PythonIcons.Python.Python)
-                    .withInsertHandler(INSERT_HANDLER)
-                result.addElement(PrioritizedLookupElement.withPriority(lookupElementBuilder, 200000.0))
-            }
+                    .withInsertHandler(FullLineInsertHandler(supporter))
+                    .withTailText(provider.description, true)
+                    .withIcon(GPT_ICON)
+
+            element.putUserData(key, prefix)
+            result.addElement(PrioritizedLookupElement.withPriority(element, 1000000.0))
+            service.firstLine = null
         }
+    }
+
+    private fun getLookupElementBuilder(supporter: LanguageMLSupporter, variant: String): LookupElementBuilder? {
+        return if (settings.state.mode == FullLineCompletionMode.ONE_TOKEN) {
+            val token = supporter.getFirstToken(variant) ?: return null
+            LookupElementBuilder.create(token)
+        } else {
+            LookupElementBuilder.create(variant)
+                    .withTypeText(FULL_LINE_TAIL_TEXT)
+                    .withInsertHandler(FullLineInsertHandler(supporter))
+        }.withTailText(provider.description, true).withIcon(GPT_ICON)
+    }
+
+    private fun insideLine(document: Document, offset: Int): Boolean {
+        val endLine = document.getLineEndOffset(document.getLineNumber(offset))
+        val rightText = document.getText(TextRange(offset, endLine))
+
+        return rightText.isNotBlank()
+    }
+
+    private fun getFilePath(file: PsiFile): String {
+        val projectPath = file.project.basePath ?: "/"
+        val filePath = file.virtualFile.path
+
+        return filePath.drop(projectPath.length + 1)
+    }
+
+    companion object {
+        const val FULL_LINE_TAIL_TEXT = "full-line"
+        val GPT_ICON: Icon = PythonIcons.Python.Python
+
+        val LOG = Logger.getInstance(FullLineContributor::class.java)
     }
 }

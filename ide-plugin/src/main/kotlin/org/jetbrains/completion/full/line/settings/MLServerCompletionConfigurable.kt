@@ -1,0 +1,134 @@
+package org.jetbrains.completion.full.line.settings
+
+import com.intellij.openapi.options.BoundConfigurable
+import com.intellij.openapi.options.SearchableConfigurable
+import com.intellij.openapi.ui.DialogPanel
+import com.intellij.openapi.util.ActionCallback
+import com.intellij.openapi.util.registry.Registry
+import com.intellij.ui.JBColor
+import com.intellij.ui.MutableCollectionComboBoxModel
+import com.intellij.ui.layout.*
+import com.intellij.util.ui.AsyncProcessIcon
+import org.jdesktop.swingx.combobox.ListComboBoxModel
+import org.jetbrains.completion.full.line.models.FullLineCompletionMode
+import org.jetbrains.completion.full.line.settings.MLServerCompletionBundle.Companion.message
+import java.awt.Color
+import javax.swing.JLabel
+import kotlin.reflect.KMutableProperty0
+
+class MLServerCompletionConfigurable(
+        private val models: List<String>,
+        private val statusChecker: () -> ActionCallback
+) : BoundConfigurable("Server Code Completion"), SearchableConfigurable {
+    private lateinit var gpt: ComponentPredicate
+    private lateinit var statusText: JLabel
+    private lateinit var loadingIcon: AsyncProcessIcon
+    private val settings = MLServerCompletionSettings.getInstance().state
+
+    override fun createPanel(): DialogPanel {
+        return panel {
+            titledRow(message("ml.server.completion.settings.group")) {
+                row {
+                    gpt = checkBox(message("ml.server.completion.title"), settings::enable).selected
+                    row {
+                        cell {
+                            button(message("ml.server.completion.connection")) { checkStatus() }
+                            loadingIcon = loadingIcon().component
+                            statusText = statusText("").component
+                        }
+                    }
+                }
+                row {
+                    row {
+                        buttonGroup(settings::mode) {
+                            label(message("ml.server.completion.mode"))
+                            row { radioButton(message("ml.server.completion.mode.full.line"), FullLineCompletionMode.FULL_LINE) }
+                            row { radioButton(message("ml.server.completion.mode.one.token"), FullLineCompletionMode.ONE_TOKEN) }
+                        }
+                    }
+
+                    row {
+                        checkBox(message("ml.server.completion.autoPopup"), settings::autoPopup)
+                    }
+
+                    row {
+                        checkBox(message("ml.server.completion.enable.strings.walking"), settings::stringsWalking)
+                    }
+
+                    row {
+                        checkBox(message("ml.server.completion.only.full"), settings::onlyFullLines)
+                    }
+
+                    row {
+                        checkBox(message("ml.server.completion.group.answers"), settings::groupAnswers)
+                    }
+
+                    row {
+                        checkBox(message("ml.server.completion.normalize"), settings::normalize)
+                    }
+
+                    row {
+                        val use = checkBox(message("ml.server.completion.top.n.use"), settings::useTopN).selected
+                        row { intTextFieldFixed(settings::topN, 1, IntRange(0, 100)) }.enableIf(use)
+                    }
+
+                    if (Registry.get("ml.server.completion.expand.settings").asBoolean()) {
+                        expandedSettingsPanel()
+                    }
+                }.enableSubRowsIf(gpt)
+            }
+        }
+    }
+
+    private fun Row.expandedSettingsPanel() {
+        row(message("ml.server.completion.bs")) {
+            row(message("ml.server.completion.model.pick")) {
+                comboBox(MutableCollectionComboBoxModel(models), settings::model)
+            }
+
+            row(message("ml.server.completion.bs.num.iterations")) {
+                intTextFieldFixed(settings::numIterations, 1, IntRange(0, 50))
+            }
+            row(message("ml.server.completion.bs.beam.size")) {
+                intTextFieldFixed(settings::beamSize, 1, IntRange(0, 20))
+            }
+            row(message("ml.server.completion.bs.diversity.strength")) {
+                doubleTextField(settings::diversityStrength, 1, IntRange(0, 1))
+            }
+            row(message("ml.server.completion.bs.diversity.groups")) {
+                intTextFieldFixed(settings::diversityGroups, 1, IntRange(0, 10))
+                row {
+                    val groupUse = checkBox(message("ml.server.completion.group.top.n.use"), settings::useGroupTopN).selected
+                    row { intTextFieldFixed(settings::groupTopN, 1, IntRange(0, 10)) }.enableIf(groupUse)
+                }
+            }
+        }
+    }
+
+    private fun checkStatus() {
+        val t1 = System.currentTimeMillis()
+        loadingIcon.resume()
+        loadingIcon.isVisible = true
+        statusText.isVisible = false
+
+        statusChecker().doWhenDone {
+            statusText.text = "Successful with ${System.currentTimeMillis() - t1}ms delay"
+            statusText.foreground = JBColor(JBColor.GREEN.darker(), JBColor.GREEN.brighter())
+        }.doWhenRejected(Runnable {
+            statusText.text = "Invalid"
+            statusText.foreground = JBColor.RED
+        }).doWhenProcessed {
+            loadingIcon.suspend()
+            loadingIcon.isVisible = false
+            statusText.isVisible = true
+        }
+    }
+
+    override fun getHelpTopic(): String {
+        return "ml.server.completion"
+    }
+
+    override fun getId(): String {
+        return helpTopic
+    }
+}

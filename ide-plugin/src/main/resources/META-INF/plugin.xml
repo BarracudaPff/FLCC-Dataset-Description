@@ -1,8 +1,7 @@
 <idea-plugin>
     <id>org.jetbrains.completion.full.line</id>
     <name>Full Line Code Completion</name>
-    <version>0.0.1</version>
-    <idea-version since-build="192"/>
+    <idea-version since-build="201"/>
     <vendor url="https://www.jetbrains.com">JetBrains</vendor>
 
     <description><![CDATA[
@@ -13,17 +12,26 @@
     <depends>com.intellij.modules.python</depends>
 
     <extensions defaultExtensionNs="com.intellij">
+        <applicationService
+                serviceImplementation="org.jetbrains.completion.full.line.settings.MLServerCompletionSettings"/>
+        <applicationService
+                serviceInterface="org.jetbrains.completion.full.line.services.NextLevelFullLineCompletion"
+                serviceImplementation="org.jetbrains.completion.full.line.services.NextLevelFullLineCompletionImpl"/>
         <completion.contributor language="Python"
                                 id="FullLineCompletionContributor"
-                                order="last"
+                                order="first"
                                 implementationClass="org.jetbrains.completion.full.line.FullLineContributor"/>
-        <registryKey key="full.line.completion.server.url" defaultValue="54.92.216.222"
+        <registryKey key="ml.server.completion.host" defaultValue="18.195.236.90"
                      description="Full line completion server address"/>
 
-        <registryKey key="full.line.completion.server.port" defaultValue="5001"
+        <registryKey key="ml.server.completion.port" defaultValue="5001"
                      description="Port for full line completion"/>
 
-        <registryKey key="full.line.completion.enable" defaultValue="true"
-                     description="Enable full line code completion"/>
+        <registryKey key="ml.server.completion.expand.settings" defaultValue="false"
+                     description="Show expanded settings panel for ML server completion"/>
+
+        <codeCompletionConfigurable id="ml.server.completion"
+                                    provider="org.jetbrains.completion.full.line.settings.ServerCompletionConfigurableProvider"
+                                    bundle="messages.MLServerCompletionBundle"/>
     </extensions>
 </idea-plugin>
