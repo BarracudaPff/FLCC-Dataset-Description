@@ -1,10 +1,7 @@
 package org.jetbrains.completion.full.line.language.formatters.python
 
 import com.intellij.psi.PsiWhiteSpace
-import com.intellij.psi.SyntaxTraverser
-import com.intellij.psi.impl.source.tree.LeafPsiElement
 import com.jetbrains.python.psi.PyExpression
-import com.jetbrains.python.psi.PyStringElement
 
 fun isNewLine(text: String): Boolean {
     return text.matches(Regex("\\n\\s*"))
@@ -53,12 +50,19 @@ fun formatInt(text: String, allowUnderscores: Boolean): String {
     }.toString()
 }
 
-fun handlePyArgumentList(arguments: Array<PyExpression>): String {
+fun handlePyArgumentList(arguments: Array<PyExpression>, lastComma: Boolean = false, closable: Boolean = true): String {
     val text = StringBuilder("(")
     arguments.forEach {
         text.append(it.text).append(", ")
     }
-    text.delete(text.length - 2, text.length).append(")")
+    if (!lastComma) {
+        text.delete(text.length - 2, text.length)
+    } else {
+        text.delete(text.length - 1, text.length)
+    }
+    if (closable) {
+        text.append(")")
+    }
     return text.toString()
 }
 

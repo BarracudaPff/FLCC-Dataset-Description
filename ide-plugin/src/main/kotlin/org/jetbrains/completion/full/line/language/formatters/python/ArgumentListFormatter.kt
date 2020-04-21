@@ -20,7 +20,7 @@ class ArgumentListFormatter : ElementFormatter {
                 element.text
             }
         } else {
-            handlePyArgumentList(element.arguments)
+            handlePyArgumentList(element.arguments, element.text.last() == ',', element.closingParen != null)
         }
 
     }
