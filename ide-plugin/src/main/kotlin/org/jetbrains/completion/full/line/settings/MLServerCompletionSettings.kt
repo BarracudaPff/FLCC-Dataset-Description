@@ -21,6 +21,14 @@ class MLServerCompletionSettings : PersistentStateComponent<MLServerCompletionSe
     fun isAutoPopup() = state.autoPopup
 
     override fun getState(): State {
+        val isTesting = System.getenv("flcc_evaluating")
+        if (isTesting != null && isTesting.toBoolean()) {
+            state.model             = System.getenv("flcc_model")                       ?: state.model
+            state.numIterations     = System.getenv("flcc_numIterations")?.toInt()      ?: state.numIterations
+            state.beamSize          = System.getenv("flcc_beamSize")?.toInt()           ?: state.beamSize
+            state.diversityGroups   = System.getenv("flcc_diversityGroups")?.toInt()    ?: state.diversityGroups
+            state.onlyFullLines     = System.getenv("flcc_onlyFullLines")?.toBoolean()  ?: state.onlyFullLines
+        }
         return state
     }
 
@@ -54,7 +62,6 @@ class MLServerCompletionSettings : PersistentStateComponent<MLServerCompletionSe
             var useTopN: Boolean = false,
             var useGroupTopN: Boolean = false,
             var model: String = "best",
-            var groupAnswers: Boolean = false,
-            var normalize: Boolean = false
+            var groupAnswers: Boolean = false
     )
 }
