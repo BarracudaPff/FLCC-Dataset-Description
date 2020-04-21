@@ -32,6 +32,18 @@ open class PythonCodeFormatterTest : CodeFormatterTest(PythonCodeFormatter()) {
         })
     }
 
+    protected fun testCodeFragment(actualCode: String, expectedCode: String, offset: Int? = null) {
+        if (offset != null) {
+            assert(actualCode.length >= offset)
+        }
+        invokeTestRunnable(Runnable {
+            val file = fixture.configureByText(PythonFileType.INSTANCE, actualCode)
+            val ideaContent = formatter.format(file, TextRange(0, offset ?: file.textLength))
+
+            Assert.assertEquals(expectedCode, ideaContent)
+        })
+    }
+
     private fun formatFileWithCommand(formatterCommand: String, filename: String? = null) {
         val file = if (filename != null) {
             createTempFile(filename)
