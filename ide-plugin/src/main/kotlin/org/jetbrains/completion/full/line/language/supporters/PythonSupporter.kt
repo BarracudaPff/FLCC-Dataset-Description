@@ -10,7 +10,6 @@ import com.intellij.psi.SyntaxTraverser
 import com.jetbrains.python.codeInsight.imports.PythonImportUtils
 import com.jetbrains.python.psi.PyElement
 import com.jetbrains.python.psi.PyNumericLiteralExpression
-import com.jetbrains.python.psi.PyPlainStringElement
 import com.jetbrains.python.psi.PyStringElement
 import org.jetbrains.completion.full.line.language.LanguageMLSupporter
 import org.jetbrains.completion.full.line.length
@@ -62,7 +61,7 @@ class PythonSupporter : LanguageMLSupporter {
                 .filter { it is PyStringElement }
                 .asIterable()
                 .map {
-                    if (it is PyStringElement) {
+                    if (it is PyStringElement && !it.isTripleQuoted) {
                         var range = it.textRange.toIntRangeWithOffsets(contentOffset - from, it.quote.length)
                         val name = "\$__Variable${id++}\$"
 
