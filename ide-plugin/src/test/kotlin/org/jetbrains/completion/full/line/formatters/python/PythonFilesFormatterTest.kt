@@ -22,10 +22,7 @@ class PythonFilesFormatterTest : PythonCodeFormatterTest() {
                 Stream.of(
                         Arguments.of("test-files/data1.py"),
                         Arguments.of("test-files/data2.py"),
-                        Arguments.of("test-files/data3.py"),
-                        Arguments.of("test-files/data4.py"),
-                        Arguments.of("test-files/data5.py"),
-                        Arguments.of("test-files/fp16util.py")
+                        Arguments.of("test-files/data3.py")
                 )
     }
 }
