@@ -10,7 +10,7 @@ group 'org.jetbrains.completion.full.line'
 if (project.hasProperty("teamcity"))
     version = "0.1." + teamcity['build.number']
 else
-    version = '0.1.49c'
+    version = '0.1'
 
 sourceCompatibility = 1.8
 
@@ -36,7 +36,7 @@ compileTestKotlin {
 }
 
 patchPluginXml {
-    sinceBuild '201'
+    sinceBuild '201.4163'
     untilBuild project.properties["ideaVersion"]
 
     changeNotes """
@@ -87,7 +87,7 @@ task generatePublicXML {
                     name("Full Line Code Completion")
                     id("org.jetbrains.completion.full.line")
                     xml.version(version)
-                    'idea-version'("since-build": "201", "until-build":project.properties["ideaVersion"])
+                    'idea-version'("since-build": "201", "until-build": project.properties["ideaVersion"])
                     vendor('url': 'https://www.jetbrains.com', "JetBrains")
                     'download-url'(buildPlugin.archiveFileName.get())
                     xml.description {
@@ -116,8 +116,8 @@ def gitBranch() {
 }
 
 intellij {
-    version project.properties["ideaVersion"]+'-EAP-SNAPSHOT'
-    plugins "PythonCore:"+project.properties["ideaVersion"]
+    version project.properties["ideaVersion"] + '-EAP-SNAPSHOT'
+    plugins "PythonCore:" + project.properties["ideaVersion"]
 }
 
 runIde {
