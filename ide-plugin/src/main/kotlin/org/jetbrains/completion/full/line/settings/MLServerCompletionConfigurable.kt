@@ -9,12 +9,9 @@ import com.intellij.ui.JBColor
 import com.intellij.ui.MutableCollectionComboBoxModel
 import com.intellij.ui.layout.*
 import com.intellij.util.ui.AsyncProcessIcon
-import org.jdesktop.swingx.combobox.ListComboBoxModel
 import org.jetbrains.completion.full.line.models.FullLineCompletionMode
 import org.jetbrains.completion.full.line.settings.MLServerCompletionBundle.Companion.message
-import java.awt.Color
 import javax.swing.JLabel
-import kotlin.reflect.KMutableProperty0
 
 class MLServerCompletionConfigurable(
         private val models: List<String>,
@@ -64,10 +61,6 @@ class MLServerCompletionConfigurable(
                     }
 
                     row {
-                        checkBox(message("ml.server.completion.normalize"), settings::normalize)
-                    }
-
-                    row {
                         val use = checkBox(message("ml.server.completion.top.n.use"), settings::useTopN).selected
                         row { intTextFieldFixed(settings::topN, 1, IntRange(0, 100)) }.enableIf(use)
                     }
@@ -83,7 +76,8 @@ class MLServerCompletionConfigurable(
     private fun Row.expandedSettingsPanel() {
         row(message("ml.server.completion.bs")) {
             row(message("ml.server.completion.model.pick")) {
-                comboBox(MutableCollectionComboBoxModel(models), settings::model)
+                //Temporary disabled because of server settings
+                comboBox(MutableCollectionComboBoxModel(models), settings::model).enabled(false)
             }
 
             row(message("ml.server.completion.bs.num.iterations")) {
