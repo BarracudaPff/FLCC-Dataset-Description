@@ -24,12 +24,10 @@ class ImportFormatter : ElementFormatter {
             imports = "*"
         }
 
-        return if (from == null) {
-            "import $imports"
-        } else if (!element.text.contains("import")) {
-            "from $from"
-        } else {
-            "from $from import $imports"
+        return when {
+            from == null                        -> "import $imports"
+            !element.text.contains("import")    -> "from $from"
+            else                                -> "from $from import $imports"
         }.trimEnd()
     }
 
