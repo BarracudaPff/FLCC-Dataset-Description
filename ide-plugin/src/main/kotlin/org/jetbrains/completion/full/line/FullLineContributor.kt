@@ -31,7 +31,7 @@ class FullLineContributor : CompletionContributor() {
             return
         }
 
-        val context = if (settings.state.model.contains("gpt")) {
+        val context = if (settings.state.model.contains("gpt") || settings.state.model == "best") {
             formatter.format(parameters.originalFile, TextRange(0, parameters.offset))
         } else {
             parameters.originalFile.text
