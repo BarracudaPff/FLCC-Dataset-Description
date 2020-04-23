@@ -7,10 +7,11 @@ plugins {
 }
 
 group 'org.jetbrains.completion.full.line'
+def versionPrefix = "0.1."
 if (project.hasProperty("teamcity"))
-    version = "0.1." + teamcity['build.number']
+    version = versionPrefix + teamcity['build.number']
 else
-    version = '0.1'
+    version = versionPrefix + 'SNAPSHOT'
 
 sourceCompatibility = 1.8
 
@@ -36,8 +37,8 @@ compileTestKotlin {
 }
 
 patchPluginXml {
-    sinceBuild '201.4163'
-    untilBuild project.properties["ideaVersion"]
+    sinceBuild project.properties["sinceBuild"]
+    untilBuild project.properties["untilBuild"]
 
     changeNotes """
         0.0.4 <br>
@@ -87,7 +88,7 @@ task generatePublicXML {
                     name("Full Line Code Completion")
                     id("org.jetbrains.completion.full.line")
                     xml.version(version)
-                    'idea-version'("since-build": "201", "until-build": project.properties["ideaVersion"])
+                    'idea-version'("since-build": project.properties["sinceBuild"], "until-build": project.properties["untilBuild"])
                     vendor('url': 'https://www.jetbrains.com', "JetBrains")
                     'download-url'(buildPlugin.archiveFileName.get())
                     xml.description {
