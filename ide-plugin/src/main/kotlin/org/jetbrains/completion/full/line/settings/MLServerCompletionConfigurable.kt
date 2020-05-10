@@ -3,23 +3,20 @@ package org.jetbrains.completion.full.line.settings
 import com.intellij.openapi.options.BoundConfigurable
 import com.intellij.openapi.options.SearchableConfigurable
 import com.intellij.openapi.ui.DialogPanel
-import com.intellij.openapi.util.ActionCallback
 import com.intellij.openapi.util.registry.Registry
-import com.intellij.ui.JBColor
 import com.intellij.ui.MutableCollectionComboBoxModel
 import com.intellij.ui.layout.*
-import com.intellij.util.ui.AsyncProcessIcon
 import org.jetbrains.completion.full.line.models.FullLineCompletionMode
 import org.jetbrains.completion.full.line.settings.MLServerCompletionBundle.Companion.message
-import javax.swing.JLabel
+import org.jetbrains.concurrency.runAsync
+import kotlin.reflect.KFunction1
 
 class MLServerCompletionConfigurable(
-        private val models: List<String>,
-        private val statusChecker: () -> ActionCallback
+        private val exceptionMessage: KFunction1<Throwable, String>,
+        private val getStatus: () -> Boolean,
+        private val getModels: () -> List<String>
 ) : BoundConfigurable("Server Code Completion"), SearchableConfigurable {
     private lateinit var gpt: ComponentPredicate
-    private lateinit var statusText: JLabel
-    private lateinit var loadingIcon: AsyncProcessIcon
     private val settings = MLServerCompletionSettings.getInstance().state
 
     override fun createPanel(): DialogPanel {
@@ -27,13 +24,7 @@ class MLServerCompletionConfigurable(
             titledRow(message("ml.server.completion.settings.group")) {
                 row {
                     gpt = checkBox(message("ml.server.completion.title"), settings::enable).selected
-                    row {
-                        cell {
-                            button(message("ml.server.completion.connection")) { checkStatus() }
-                            loadingIcon = loadingIcon().component
-                            statusText = statusText("").component
-                        }
-                    }
+                    row { cell { statusButton() } }
                 }
                 row {
                     row {
@@ -74,11 +65,10 @@ class MLServerCompletionConfigurable(
     }
 
     private fun Row.expandedSettingsPanel() {
+        row { checkBox(message("ml.server.completion.score"), settings::showScore) }
+
         row(message("ml.server.completion.bs")) {
-            row(message("ml.server.completion.model.pick")) {
-                //Temporary disabled because of server settings
-                comboBox(MutableCollectionComboBoxModel(models), settings::model).enabled(false)
-            }
+            row(message("ml.server.completion.model.pick")) { modelsBox() }
 
             row(message("ml.server.completion.bs.num.iterations")) {
                 intTextFieldFixed(settings::numIterations, 1, IntRange(0, 50))
@@ -88,6 +78,12 @@ class MLServerCompletionConfigurable(
             }
             row(message("ml.server.completion.bs.diversity.strength")) {
                 doubleTextField(settings::diversityStrength, 1, IntRange(0, 1))
+            }
+            row(message("ml.server.completion.bs.len.base")) {
+                doubleTextField(settings::lenBase, 1, IntRange(0, 1))
+            }
+            row(message("ml.server.completion.bs.len.pow")) {
+                doubleTextField(settings::lenPow, 1, IntRange(0, 1))
             }
             row(message("ml.server.completion.bs.diversity.groups")) {
                 intTextFieldFixed(settings::diversityGroups, 1, IntRange(0, 10))
@@ -99,23 +95,51 @@ class MLServerCompletionConfigurable(
         }
     }
 
-    private fun checkStatus() {
-        val t1 = System.currentTimeMillis()
-        loadingIcon.resume()
-        loadingIcon.isVisible = true
-        statusText.isVisible = false
-
-        statusChecker().doWhenDone {
-            statusText.text = "Successful with ${System.currentTimeMillis() - t1}ms delay"
-            statusText.foreground = JBColor(JBColor.GREEN.darker(), JBColor.GREEN.brighter())
-        }.doWhenRejected(Runnable {
-            statusText.text = "Invalid"
-            statusText.foreground = JBColor.RED
-        }).doWhenProcessed {
-            loadingIcon.suspend()
-            loadingIcon.isVisible = false
-            statusText.isVisible = true
+    private fun Row.modelsBox() {
+        val loadingIcon = LoadingComponent()
+        val modelBox = comboBox(MutableCollectionComboBoxModel(listOf("best")), settings::model).component.apply {
+            isVisible = false
         }
+        loadingIcon.changeState(LoadingComponent.State.LOADING)
+
+        runAsync(getModels).onSuccess {
+            modelBox.model = MutableCollectionComboBoxModel(it)
+            loadingIcon.changeState(LoadingComponent.State.SUCCESS)
+        }.onError {
+            modelBox.isEnabled = false
+            loadingIcon.changeState(LoadingComponent.State.ERROR, exceptionMessage(it))
+        }.onProcessed {
+            modelBox.isVisible = true
+            modelBox()
+            loadingIcon.changeState(LoadingComponent.State.PROCESSED)
+        }
+
+        loadingIcon.loadingIcon()
+        loadingIcon.statusText()
+    }
+
+    private fun Cell.statusButton() {
+        val loadingIcon = LoadingComponent()
+
+        button(message("ml.server.completion.connection")) {
+            loadingIcon.changeState(LoadingComponent.State.LOADING)
+
+            val t1 = System.currentTimeMillis()
+            runAsync(getStatus).onSuccess {
+                val message = if (it) {
+                    "Successful with ${System.currentTimeMillis() - t1}ms delay"
+                } else {
+                    "Status failed with ${System.currentTimeMillis() - t1}ms delay"
+                }
+                loadingIcon.changeState(LoadingComponent.State.SUCCESS, message)
+            }.onError {
+                loadingIcon.changeState(LoadingComponent.State.ERROR, exceptionMessage(it))
+            }.onProcessed {
+                loadingIcon.changeState(LoadingComponent.State.PROCESSED)
+            }
+        }
+        loadingIcon.loadingIcon()
+        loadingIcon.statusText()
     }
 
     override fun getHelpTopic(): String {
