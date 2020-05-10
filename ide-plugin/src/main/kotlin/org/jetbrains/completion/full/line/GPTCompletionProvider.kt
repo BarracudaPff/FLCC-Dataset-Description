@@ -1,16 +1,12 @@
 package org.jetbrains.completion.full.line
 
 import com.google.gson.Gson
-import com.intellij.openapi.diagnostic.Logger
-import com.intellij.openapi.util.ActionCallback
+import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.util.registry.Registry
 import com.intellij.util.concurrency.AppExecutorUtil
 import com.intellij.util.io.HttpRequests
-import org.jetbrains.completion.full.line.models.FullLineCompletionRequest
-import org.jetbrains.completion.full.line.models.FullLineCompletionResult
-import org.jetbrains.completion.full.line.models.ModelsRequest
-import org.jetbrains.completion.full.line.models.RequestError
-import org.jetbrains.completion.full.line.settings.MLServerCompletionBundle
+import org.jetbrains.completion.full.line.models.*
 import org.jetbrains.completion.full.line.settings.MLServerCompletionSettings
 import java.net.ConnectException
 import java.net.SocketTimeoutException
@@ -19,11 +15,11 @@ import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
 
 class GPTCompletionProvider {
-    val description = "  gpt"
-
-    fun getVariants(context: String, filename: String, prefix: String, offset: Int): List<String> {
+    @Suppress("RemoveExplicitTypeArguments")
+    fun getVariants(context: String, filename: String, prefix: String, offset: Int): List<FullLineCompletion> {
         val start = System.currentTimeMillis()
-        val future = executor.submit(Callable<List<String>> {
+
+        val future = executor.submit(Callable<List<FullLineCompletion>> {
             try {
                 HttpRequests.post("http://$host:$port/v1/complete/gpt", "application/json")
                         .connect { r ->
@@ -34,7 +30,7 @@ class GPTCompletionProvider {
                                     filename,
                                     MLServerCompletionSettings.getInstance())
 
-                            r.write(Gson().toJson(request))
+                            r.write(GSON.toJson(request))
 
                             val raw = r.reader.readText()
 
@@ -57,62 +53,51 @@ class GPTCompletionProvider {
 
         LOG.debug("Time to predict completions is ${(System.currentTimeMillis() - start) / 1000.0}")
         return try {
-            future.get(5, TimeUnit.SECONDS)
+            future.get(1, TimeUnit.SECONDS)
         } catch (e: Exception) {
             logError(e)
         }
     }
 
-    private fun logError(msg: String, throwable: Throwable): List<String> {
+    private fun logError(msg: String, throwable: Throwable): List<FullLineCompletion> {
         LOG.debug(msg, throwable)
         return emptyList()
     }
 
-    private fun logError(error: RequestError): List<String> = logError("Server request", error)
+    private fun logError(error: RequestError): List<FullLineCompletion> = logError("Server bad response", error)
 
-    private fun logError(error: Throwable): List<String> = logError("Server request", error)
+    private fun logError(error: Throwable): List<FullLineCompletion> = logError("Server request", error)
 
     companion object {
-        private val LOG = Logger.getInstance(FullLineContributor::class.java)
+        private val LOG = logger<FullLineContributor>()
         private val GSON = Gson()
+
+        private const val timeout = 3L
 
         private val host = Registry.get("ml.server.completion.host").asString()
         private val port = Registry.get("ml.server.completion.port").asInteger()
 
         fun getModels(): List<String> {
+            LOG.info("Getting models")
             val future = executor.submit(Callable {
-                try {
-                    HttpRequests.request("http://$host:$port/v1/models").connect { r ->
-                        val res = Gson().fromJson(r.reader, ModelsRequest::class.java)
+                HttpRequests.request("http://$host:$port/v1/models").connect { r ->
+                    val res = GSON.fromJson(r.reader, ModelsRequest::class.java)
 
-                        listOf("best (${res.bestModel.name})") + res.models.map { model -> model.name }
-                    }
-                } catch (e: Exception) {
-                    emptyList<String>()
+                    listOf("best (${res.bestModel.name})") + res.models.map { model -> model.name }
                 }
             })
-            awaitWithCheckCanceled(future)
+            ProgressManager.checkCanceled()
 
-            return future.get()
+            return future.get(timeout, TimeUnit.SECONDS)
         }
 
-        fun getStatusCallback(): ActionCallback {
-            val callback = ActionCallback()
-            executor.submit {
-                try {
-                    if (HttpRequests.request("http://$host:$port/v1/status").tryConnect() == 200) {
-                        callback.setDone()
-                    } else {
-                        callback.reject(MLServerCompletionBundle.message("ml.server.completion.gpt.connection.error"))
-                    }
-                } catch (e: SocketTimeoutException) {
-                    callback.reject(MLServerCompletionBundle.message("ml.server.completion.gpt.connection.timeout"))
-                } catch (e: Exception) {
-                    callback.reject(e.localizedMessage)
-                }
-
-            }
-            return callback
+        fun getStatus(): Boolean {
+            LOG.info("Getting status")
+            val future = executor.submit(Callable {
+                HttpRequests.request("http://$host:$port/v1/status").tryConnect() == 200
+            })
+            ProgressManager.checkCanceled()
+            return future.get(timeout, TimeUnit.SECONDS)
         }
 
         //Completion server cancels all threads besides the last one
