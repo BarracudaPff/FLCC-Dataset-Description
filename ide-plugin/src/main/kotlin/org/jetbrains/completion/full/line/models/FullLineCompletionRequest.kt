@@ -20,6 +20,10 @@ data class FullLineCompletionRequest(
         val diversityGroups: Int,
         @SerializedName("diversity_strength")
         val diversityStrength: Double,
+        @SerializedName("len_norm_base")
+        val lenNormBase: Double,
+        @SerializedName("len_norm_pow")
+        val lenNormPow: Double,
 
         @SerializedName("top_n")
         val topN: Int?,
@@ -42,6 +46,8 @@ data class FullLineCompletionRequest(
             settings.state.beamSize,
             settings.state.diversityGroups,
             settings.state.diversityStrength,
+            settings.state.lenBase,
+            settings.state.lenPow,
             if (settings.state.useTopN) settings.state.topN else null,
             if (settings.state.useGroupTopN) settings.state.groupTopN else null,
             settings.state.onlyFullLines,
