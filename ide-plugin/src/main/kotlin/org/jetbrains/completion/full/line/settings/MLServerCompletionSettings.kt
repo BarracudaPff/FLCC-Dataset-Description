@@ -27,6 +27,8 @@ class MLServerCompletionSettings : PersistentStateComponent<MLServerCompletionSe
             state.numIterations     = System.getenv("flcc_numIterations")?.toInt()      ?: state.numIterations
             state.beamSize          = System.getenv("flcc_beamSize")?.toInt()           ?: state.beamSize
             state.diversityGroups   = System.getenv("flcc_diversityGroups")?.toInt()    ?: state.diversityGroups
+            state.lenBase           = System.getenv("flcc_lenBase")?.toDouble()         ?: state.lenBase
+            state.lenPow            = System.getenv("flcc_lenPow")?.toDouble()          ?: state.lenPow
             state.onlyFullLines     = System.getenv("flcc_onlyFullLines")?.toBoolean()  ?: state.onlyFullLines
         }
         return state
@@ -50,15 +52,19 @@ class MLServerCompletionSettings : PersistentStateComponent<MLServerCompletionSe
             var onlyFullLines: Boolean = true,
 
             var mode: FullLineCompletionMode = FullLineCompletionMode.FULL_LINE,
+
             // Beam search configuration
             var numIterations: Int = 10,
             var beamSize: Int = 6,
             var diversityGroups: Int = 5,
             var diversityStrength: Double = 0.3,
+            var lenPow: Double = 0.0,
+            var lenBase: Double = 0.0,
             var topN: Int = 5,
             var groupTopN: Int = 5,
 
             //Additional setting for correct usage
+            var showScore: Boolean = false,
             var useTopN: Boolean = false,
             var useGroupTopN: Boolean = false,
             var model: String = "best",
