@@ -10,15 +10,20 @@ import com.intellij.psi.PsiFile
 import icons.PythonIcons
 import org.jetbrains.completion.full.line.language.CodeFormatter
 import org.jetbrains.completion.full.line.language.LanguageMLSupporter
+import org.jetbrains.completion.full.line.models.FullLineCompletion
 import org.jetbrains.completion.full.line.models.FullLineCompletionMode
 import org.jetbrains.completion.full.line.services.NextLevelFullLineCompletion
 import org.jetbrains.completion.full.line.settings.MLServerCompletionSettings
+import java.math.RoundingMode
+import java.text.DecimalFormat
 import javax.swing.Icon
 
 class FullLineContributor : CompletionContributor() {
     private val provider = GPTCompletionProvider()
     private val settings = MLServerCompletionSettings.getInstance()
     private val service: NextLevelFullLineCompletion = service()
+
+    private val scoreFormatter = DecimalFormat("#.####").apply { roundingMode = RoundingMode.DOWN }
 
     override fun fillCompletionVariants(parameters: CompletionParameters, result: CompletionResultSet) {
         if (!settings.isEnabled() || (parameters.isAutoPopup && !settings.isAutoPopup()))
@@ -46,9 +51,9 @@ class FullLineContributor : CompletionContributor() {
         handleFirstLine(result, supporter, prefix)
 
         for (variant in provider.getVariants(context, filename, prefix, offset)) {
-            val element = getLookupElementBuilder(supporter, variant) ?: continue
+            val element = getLookupElementBuilder(supporter, variant, prefix) ?: continue
             element.putUserData(key, prefix)
-            result.addElement(PrioritizedLookupElement.withPriority(element, 100000.0))
+            result.addElement(PrioritizedLookupElement.withPriority(element, variant.score * 1000000))
         }
     }
 
@@ -58,7 +63,6 @@ class FullLineContributor : CompletionContributor() {
             val element = LookupElementBuilder.create(service.firstLine!!)
                     .withTypeText(FULL_LINE_TAIL_TEXT)
                     .withInsertHandler(FullLineInsertHandler(supporter))
-                    .withTailText(provider.description, true)
                     .withIcon(GPT_ICON)
 
             element.putUserData(key, prefix)
@@ -67,15 +71,21 @@ class FullLineContributor : CompletionContributor() {
         }
     }
 
-    private fun getLookupElementBuilder(supporter: LanguageMLSupporter, variant: String): LookupElementBuilder? {
+    private fun getLookupElementBuilder(supporter: LanguageMLSupporter, variant: FullLineCompletion, prefix: String): LookupElementBuilder? {
+        val tail = if (settings.state.showScore) " ${scoreFormatter.format(variant.score * 100)}%" else ""
+
         return if (settings.state.mode == FullLineCompletionMode.ONE_TOKEN) {
-            val token = supporter.getFirstToken(variant) ?: return null
+            val token = supporter.getFirstToken(variant.suggestion) ?: return null
+            if (token == prefix) {
+                return null
+            }
+
             LookupElementBuilder.create(token)
         } else {
-            LookupElementBuilder.create(variant)
+            LookupElementBuilder.create(variant.suggestion)
                     .withTypeText(FULL_LINE_TAIL_TEXT)
                     .withInsertHandler(FullLineInsertHandler(supporter))
-        }.withTailText(provider.description, true).withIcon(GPT_ICON)
+        }.withTailText(tail, true).withIcon(GPT_ICON)
     }
 
     private fun insideLine(document: Document, offset: Int): Boolean {
