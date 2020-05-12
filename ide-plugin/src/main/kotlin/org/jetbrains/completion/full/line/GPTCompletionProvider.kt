@@ -13,6 +13,8 @@ import java.net.SocketTimeoutException
 import java.util.concurrent.Callable
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
+import javax.swing.SwingUtilities
+import kotlin.test.assertFalse
 
 class GPTCompletionProvider {
     @Suppress("RemoveExplicitTypeArguments")
@@ -74,11 +76,15 @@ class GPTCompletionProvider {
 
         private const val timeout = 3L
 
-        private val host = Registry.get("ml.server.completion.host").asString()
-        private val port = Registry.get("ml.server.completion.port").asInteger()
+        private val host: String
+            get() = Registry.get("ml.server.completion.host").asString()
+        private val port: Int
+            get() = Registry.get("ml.server.completion.port").asInteger()
 
         fun getModels(): List<String> {
             LOG.info("Getting models")
+            assertFalse(SwingUtilities.isEventDispatchThread())
+
             val future = executor.submit(Callable {
                 HttpRequests.request("http://$host:$port/v1/models").connect { r ->
                     val res = GSON.fromJson(r.reader, ModelsRequest::class.java)
@@ -93,6 +99,8 @@ class GPTCompletionProvider {
 
         fun getStatus(): Boolean {
             LOG.info("Getting status")
+            assertFalse(SwingUtilities.isEventDispatchThread())
+
             val future = executor.submit(Callable {
                 HttpRequests.request("http://$host:$port/v1/status").tryConnect() == 200
             })
