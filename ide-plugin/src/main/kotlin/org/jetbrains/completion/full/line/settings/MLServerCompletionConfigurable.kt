@@ -6,15 +6,14 @@ import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.util.registry.Registry
 import com.intellij.ui.MutableCollectionComboBoxModel
 import com.intellij.ui.layout.*
+import org.jetbrains.completion.full.line.GPTCompletionProvider
 import org.jetbrains.completion.full.line.models.FullLineCompletionMode
 import org.jetbrains.completion.full.line.settings.MLServerCompletionBundle.Companion.message
 import org.jetbrains.concurrency.runAsync
 import kotlin.reflect.KFunction1
 
 class MLServerCompletionConfigurable(
-        private val exceptionMessage: KFunction1<Throwable, String>,
-        private val getStatus: () -> Boolean,
-        private val getModels: () -> List<String>
+        private val exceptionMessage: KFunction1<Throwable, String>
 ) : BoundConfigurable("Server Code Completion"), SearchableConfigurable {
     private lateinit var gpt: ComponentPredicate
     private val settings = MLServerCompletionSettings.getInstance().state
@@ -102,7 +101,9 @@ class MLServerCompletionConfigurable(
         }
         loadingIcon.changeState(LoadingComponent.State.LOADING)
 
-        runAsync(getModels).onSuccess {
+        runAsync {
+            GPTCompletionProvider.getModels()
+        }.onSuccess {
             modelBox.model = MutableCollectionComboBoxModel(it)
             loadingIcon.changeState(LoadingComponent.State.SUCCESS)
         }.onError {
@@ -125,7 +126,9 @@ class MLServerCompletionConfigurable(
             loadingIcon.changeState(LoadingComponent.State.LOADING)
 
             val t1 = System.currentTimeMillis()
-            runAsync(getStatus).onSuccess {
+            runAsync {
+                GPTCompletionProvider.getStatus()
+            }.onSuccess {
                 val message = if (it) {
                     "Successful with ${System.currentTimeMillis() - t1}ms delay"
                 } else {

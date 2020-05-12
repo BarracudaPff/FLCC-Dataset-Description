@@ -10,9 +10,7 @@ import java.util.concurrent.TimeoutException
 class ServerCompletionConfigurableProvider : ConfigurableProvider() {
     override fun createConfigurable(): Configurable? {
         return MLServerCompletionConfigurable(
-                this::exceptionMessage,
-                { GPTCompletionProvider.getStatus() },
-                { GPTCompletionProvider.getModels() }
+                this::exceptionMessage
         )
     }
 
