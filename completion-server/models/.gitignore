@@ -1,3 +1,0 @@
-# Exclude everything, but not data folder's git keep
-!data/.gitkeep
-*
