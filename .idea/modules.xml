@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+    <component name="ProjectModuleManager">
+        <modules>
+            <module fileurl="file://$PROJECT_DIR$/completion-server/.idea/completion-server.iml"
+                    filepath="$PROJECT_DIR$/completion-server/.idea/completion-server.iml"/>
+            <module fileurl="file://$PROJECT_DIR$/dataset/.idea/dataset.iml"
+                    filepath="$PROJECT_DIR$/dataset/.idea/dataset.iml"/>
+            <module fileurl="file://$PROJECT_DIR$/.idea/full-line-code-completion.iml"
+                    filepath="$PROJECT_DIR$/.idea/full-line-code-completion.iml"/>
+        </modules>
+    </component>
+</project>

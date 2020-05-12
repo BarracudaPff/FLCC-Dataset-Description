@@ -1,0 +1,18 @@
+# top-most EditorConfig file
+root = true
+
+# defaults
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+
+# and travis does its own thing
+[.travis.yml]
+indent_style = space
+indent_size = 2
+
+# 4 space indentation for Python
+[*.py]
+indent_style = space
+indent_size = 4
