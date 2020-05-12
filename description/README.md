@@ -174,7 +174,7 @@ Full dataset slitted by parts
 Full statistic about amount of files per language or extension placed in [statistic](statistics) folder. Slitted by parts or united for repositories with 50 or more stars 
 
 #### First 60 languages and languages with extensions
-![First 60 languages](/docs/images/f_l.png) ![First 60 languages and extensions](/docs/images/f_l_e.png)
+![First 60 languages](/description/docsription/docs/images/f_l.png) ![First 60 languages and extensions](/description/docsription/docs/images/f_l_e.png)
 
 &nbsp;
 ### Spikes
